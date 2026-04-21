@@ -65,34 +65,54 @@ from services.firestore_repo import (
 )
 
 # Inicializar Firebase Admin y Firestore
-# Resolución de ruta de credenciales:
-# 1) Variable de entorno FIREBASE_CREDENTIALS
+# Resolución de credenciales:
+# 1) Variable de entorno FIREBASE_CREDENTIALS (puede ser ruta de archivo o contenido JSON)
 # 2) Archivo 'firebase-key.json' en la raíz del proyecto
 # 3) Auto-descubrimiento: cualquier *.json que contenga 'firebase-adminsdk' en el nombre dentro del directorio del proyecto
+import json
+
 _PROJECT_DIR = os.path.dirname(__file__)
-CRED_PATH = os.getenv('FIREBASE_CREDENTIALS', os.path.join(_PROJECT_DIR, 'firebase-key.json'))
-if not os.path.exists(CRED_PATH):
-    try:
-        for fname in os.listdir(_PROJECT_DIR):
-            if fname.endswith('.json') and 'firebase-adminsdk' in fname:
-                CRED_PATH = os.path.join(_PROJECT_DIR, fname)
-                break
-    except Exception:
-        pass
+firebase_creds_env = os.getenv('FIREBASE_CREDENTIALS')
+
+# Intentar obtener credenciales
+cred = None
+if firebase_creds_env:
+    # Verificar si es una ruta de archivo válida
+    if os.path.exists(firebase_creds_env):
+        CRED_PATH = firebase_creds_env
+        cred = credentials.Certificate(CRED_PATH)
+    else:
+        # Asumir que es contenido JSON directo
+        try:
+            creds_dict = json.loads(firebase_creds_env)
+            cred = credentials.Certificate(creds_dict)
+        except Exception as e:
+            print(f"Error parseando FIREBASE_CREDENTIALS como JSON: {e}")
+else:
+    # Buscar archivo local
+    CRED_PATH = os.path.join(_PROJECT_DIR, 'firebase-key.json')
+    if not os.path.exists(CRED_PATH):
+        try:
+            for fname in os.listdir(_PROJECT_DIR):
+                if fname.endswith('.json') and 'firebase-adminsdk' in fname:
+                    CRED_PATH = os.path.join(_PROJECT_DIR, fname)
+                    break
+        except Exception:
+            pass
+    
+    if os.path.exists(CRED_PATH):
+        cred = credentials.Certificate(CRED_PATH)
 
 try:
     # Si no hay una app inicializada, inicializar con credenciales
     firebase_admin.get_app()
 except ValueError:
-    if os.path.exists(CRED_PATH):
-        cred = credentials.Certificate(CRED_PATH)
+    if cred:
         firebase_admin.initialize_app(cred)
     else:
-        print(f"Advertencia: credenciales Firebase no encontradas en {CRED_PATH}. Firestore no inicializado.")
+        print("Advertencia: credenciales Firebase no encontradas. Firestore no inicializado.")
 
-    firestore_db = firestore.client()
-except Exception:
-    firestore_db = None
+firestore_db = firestore.client() if cred else None
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'tu_clave_secreta_aqui_cambiar_en_produccion')
