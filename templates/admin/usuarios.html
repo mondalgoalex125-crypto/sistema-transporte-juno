@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Usuarios - Sistema de Transporte{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar fade-in">
+                <h5 class="mb-3"><i class="fas fa-user-shield"></i> Panel de Admin</h5>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_planificacion') }}">
+                        <i class="fas fa-calendar-alt"></i> Planificación
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_rutas') }}">
+                        <i class="fas fa-route"></i> Gestión de Rutas
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_precios_tramos') }}">
+                        <i class="fas fa-dollar-sign"></i> Precios por Tramo
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_control_comercial') }}">
+                        <i class="fas fa-chart-line"></i> Control Comercial
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_atencion_cliente') }}">
+                        <i class="fas fa-headset"></i> Atención al Cliente
+                    </a>
+                    <a class="nav-link active" href="{{ url_for('admin_usuarios') }}">
+                        <i class="fas fa-users"></i> Usuarios
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_perfil') }}">
+                        <i class="fas fa-user-edit"></i> Mi Perfil
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="content-wrapper fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">
+                        <i class="fas fa-users"></i> Gestión de Usuarios
+                    </h2>
+                    <a href="{{ url_for('exportar_usuarios_pdf') }}" class="btn btn-success" target="_blank">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </a>
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="stat-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-1">Total Usuarios</p>
+                                    <h3>{{ usuarios|length }}</h3>
+                                </div>
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-1">Pasajeros Activos</p>
+                                    <h3>{{ usuarios|selectattr('rol', 'equalto', 'pasajero')|list|length }}</h3>
+                                </div>
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Usuarios -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Lista de Usuarios
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Teléfono</th>
+                                        <th>Rol</th>
+                                        <th>Fecha Registro</th>
+                                        <th>Compras</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for usuario in usuarios %}
+                                    <tr>
+                                        <td>#{{ usuario.id }}</td>
+                                        <td>
+                                            <i class="fas fa-user-circle"></i> {{ usuario.nombre }}
+                                        </td>
+                                        <td>{{ usuario.email }}</td>
+                                        <td>{{ usuario.telefono }}</td>
+                                        <td>
+                                            {% if usuario.rol == 'admin' %}
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-user-shield"></i> Admin
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-primary">
+                                                    <i class="fas fa-user"></i> Pasajero
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ usuario.fecha_registro.strftime('%d/%m/%Y') }}</td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                {{ usuario.ventas|length }} compra(s)
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

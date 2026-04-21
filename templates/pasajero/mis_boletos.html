@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Boletos - Sistema de Transporte{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar fade-in">
+                <h5 class="mb-3"><i class="fas fa-user-circle"></i> Panel de Pasajero</h5>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{{ url_for('pasajero_dashboard') }}">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                    <a class="nav-link" href="{{ url_for('buscar_viajes') }}">
+                        <i class="fas fa-search"></i> Buscar Viajes
+                    </a>
+                    <a class="nav-link active" href="{{ url_for('mis_boletos') }}">
+                        <i class="fas fa-ticket-alt"></i> Mis Boletos
+                    </a>
+                    <a class="nav-link" href="{{ url_for('mis_consultas') }}">
+                        <i class="fas fa-comments"></i> Atención al Cliente
+                    </a>
+                    <a class="nav-link" href="{{ url_for('pasajero_perfil') }}">
+                        <i class="fas fa-user-edit"></i> Mi Perfil
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="content-wrapper fade-in">
+                <h2 class="mb-4">
+                    <i class="fas fa-ticket-alt"></i> Mis Boletos
+                </h2>
+
+                {% if ventas %}
+                <div class="row">
+                    {% for venta in ventas %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card {% if venta.estado == 'confirmado' %}border-success{% else %}border-danger{% endif %}">
+                            <div class="card-header {% if venta.estado == 'confirmado' %}bg-success{% else %}bg-danger{% endif %} text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-ticket-alt"></i> Boleto #{{ venta.id }}
+                                    </h5>
+                                    {% if venta.estado == 'confirmado' %}
+                                        <span class="badge bg-light text-success">Confirmado</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-danger">Cancelado</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    {% if venta.es_tramo_estandar %}
+                                        <i class="fas fa-bus-alt text-warning"></i> {{ venta.origen_real }} → {{ venta.destino_real }}
+                                        <span class="badge bg-warning text-dark ms-2">CON PARADAS</span>
+                                    {% else %}
+                                        {% if venta.viaje %}
+                                            <i class="fas fa-route"></i> {{ venta.viaje.ruta.origen }} → {{ venta.viaje.ruta.destino }}
+                                        {% else %}
+                                            <i class="fas fa-route"></i> Ruta no disponible
+                                        {% endif %}
+                                    {% endif %}
+                                </h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <p class="mb-2">
+                                            <i class="fas fa-calendar text-primary"></i>
+                                            <strong>Fecha Viaje:</strong><br>
+                                            <small>{% if venta.viaje %}{{ venta.viaje.fecha_salida.strftime('%d/%m/%Y') }}{% else %}No disponible{% endif %}</small>
+                                        </p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="mb-2">
+                                            <i class="fas fa-clock text-info"></i>
+                                            <strong>Hora:</strong><br>
+                                            <small>{% if venta.viaje %}{{ venta.viaje.hora_salida }}{% else %}No disponible{% endif %}</small>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <p class="mb-2">
+                                            <i class="fas fa-ticket-alt text-warning"></i>
+                                            <strong>Boletos:</strong><br>
+                                            <span class="badge bg-info">{{ venta.cantidad_boletos }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="mb-2">
+                                            <i class="fas fa-credit-card text-success"></i>
+                                            <strong>Método Pago:</strong><br>
+                                            <small>{{ venta.metodo_pago|capitalize }}</small>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <small class="text-muted">Total Pagado</small>
+                                        <h4 class="text-success mb-0">S/. {{ "%.2f"|format(venta.total) }}</h4>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted d-block">Comprado el</small>
+                                        <small>{{ venta.fecha_compra.strftime('%d/%m/%Y') }}</small>
+                                        <div class="mt-2">
+                                            <a href="{{ url_for('ver_comprobante', venta_id=venta.id) }}" class="btn btn-sm btn-outline-primary" title="Ver Comprobante">
+                                                <i class="fas fa-eye"></i> Ver Comprobante
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if venta.estado == 'confirmado' %}
+                                <div class="alert alert-success mt-3 mb-0">
+                                    <small>
+                                        <i class="fas fa-check-circle"></i>
+                                        Presenta este boleto en el terminal antes de abordar
+                                    </small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-ticket-alt fa-5x text-muted mb-4"></i>
+                    <h4 class="text-muted mb-3">No tienes boletos comprados</h4>
+                    <p class="text-muted mb-4">¡Comienza a viajar con nosotros!</p>
+                    <a href="{{ url_for('buscar_viajes') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-search"></i> Buscar Viajes
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

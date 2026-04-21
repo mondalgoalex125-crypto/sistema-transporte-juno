@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Política de Carga - JUNO EXPRESS{% endblock %}
+{% block content %}
+
+<style>
+  .cargo-wrap { font-family: 'Segoe UI', sans-serif; padding: 2.5rem 1rem; }
+  .cargo-hero { text-align: center; margin-bottom: 2rem; }
+  .tag-label { display:inline-block; background:#f9eded; color:#7a1c1c; border-radius:6px; font-size:11px; font-weight:700; padding:3px 12px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; }
+  .cargo-hero h2 { font-size:2rem; font-weight:700; color:#7a1c1c; margin-bottom:4px; }
+  .cargo-hero p { font-size:15px; color:#6c757d; max-width:580px; margin:0 auto; line-height:1.8; }
+  .linea { width:55px; height:3px; background:#7a1c1c; margin:10px auto 20px; border-radius:2px; }
+
+  /* Servicios */
+  .svc-card { border-top:3px solid #7a1c1c !important; border-radius:12px; transition: transform 0.2s; }
+  .svc-card:hover { transform: translateY(-4px); }
+  .svc-icon { width:60px; height:60px; background:#7a1c1c; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+  .svc-icon i { font-size:1.5rem; color:#fff; }
+  .svc-card h5 { font-size:15px; font-weight:700; color:#2d2d2d; }
+  .svc-card p { font-size:13px; color:#6c757d; line-height:1.6; }
+
+  /* Política */
+  .pol-card { background:#f8f9fa; border-radius:10px; padding:1rem 1.25rem; display:flex; gap:14px; align-items:flex-start; }
+  .pol-icon { min-width:40px; height:40px; background:#7a1c1c; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+  .pol-icon i { color:#fff; font-size:1rem; }
+  .pol-card h6 { font-size:14px; font-weight:700; color:#2d2d2d; margin-bottom:4px; }
+  .pol-card p { font-size:13px; color:#6c757d; margin:0; line-height:1.5; }
+
+  .alerta-custom { display:flex; align-items:flex-start; gap:12px; background:#fff8e1; border-left:4px solid #f59e0b; border-radius:0 10px 10px 0; padding:16px 20px; }
+  .alerta-custom i { color:#b45309; font-size:1.1rem; margin-top:2px; }
+  .alerta-custom p { font-size:14px; color:#78350f; margin:0; line-height:1.6; }
+</style>
+
+<div class="container cargo-wrap">
+
+  <!-- HERO -->
+  <div class="cargo-hero">
+    <span class="tag-label">Logística confiable</span>
+    <h2><i class="fas fa-box me-2"></i>Nuestros Servicios de Carga</h2>
+    <div class="linea"></div>
+    <p>En JUNO EXPRESS trasladamos tu carga con seguridad, rapidez y responsabilidad. Contamos con distintas modalidades para adaptarnos a tus necesidades, ya sea un pequeño paquete o un envío de mayor volumen. Tu confianza es nuestra prioridad en cada ruta.</p>
+  </div>
+
+  <!-- SERVICIOS -->
+  <div class="row justify-content-center g-3 mb-4">
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100 svc-card">
+        <div class="card-body text-center p-4">
+          <div class="svc-icon"><i class="fas fa-truck"></i></div>
+          <h5>Encomiendas</h5>
+          <p>Envíos rápidos de paquetes pequeños entre nuestras sedes con entrega el mismo día.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100 svc-card">
+        <div class="card-body text-center p-4">
+          <div class="svc-icon"><i class="fas fa-suitcase"></i></div>
+          <h5>Carga Personal</h5>
+          <p>Equipaje y pertenencias de viajeros transportadas con cuidado y puntualidad.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100 svc-card">
+        <div class="card-body text-center p-4">
+          <div class="svc-icon"><i class="fas fa-boxes-stacked"></i></div>
+          <h5>Carga Comercial</h5>
+          <p>Soluciones para empresas que necesitan mover mercadería entre ciudades regularmente.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100 svc-card">
+        <div class="card-body text-center p-4">
+          <div class="svc-icon"><i class="fas fa-box-open"></i></div>
+          <h5>Carga Especial</h5>
+          <p>Artículos frágiles, electrónicos o de valor con declaración y seguro incluido.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="opacity-25 my-4">
+
+  <!-- POLÍTICA -->
+  <div class="text-center mb-3">
+    <h3 style="font-size:1.5rem; font-weight:700; color:#7a1c1c;">Política de Carga</h3>
+    <div class="linea"></div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="pol-card">
+        <div class="pol-icon"><i class="fas fa-briefcase"></i></div>
+        <div>
+          <h6>Equipaje de Mano</h6>
+          <p>Máximo 5 kg por pasajero. Debe caber bajo el asiento o en el compartimento superior.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="pol-card">
+        <div class="pol-icon"><i class="fas fa-suitcase-rolling"></i></div>
+        <div>
+          <h6>Equipaje Documentado</h6>
+          <p>Hasta 20 kg sin costo adicional. Por cada kg extra se aplica tarifa de S/. 2.00.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="pol-card">
+        <div class="pol-icon"><i class="fas fa-shield-halved"></i></div>
+        <div>
+          <h6>Seguro de Carga</h6>
+          <p>Disponible para artículos de valor. Consulta en ventanilla por coberturas y tarifas.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="pol-card">
+        <div class="pol-icon"><i class="fas fa-clock"></i></div>
+        <div>
+          <h6>Horario de Recepción</h6>
+          <p>Recibimos carga 30 minutos antes de cada salida. Sin excepciones por política operativa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTA -->
+<div class="alert alert-warning d-flex align-items-start shadow-sm" role="alert">
+  <i class="fas fa-triangle-exclamation me-3 mt-1 fs-5"></i>
+  <div>
+    <strong>Importante:</strong>
+    No se permite transportar materiales peligrosos, sustancias inflamables, artículos prohibidos por ley ni objetos que puedan poner en riesgo la seguridad de los pasajeros y del personal.
+  </div>
+</div>
+</div>
+
+{% endblock %}

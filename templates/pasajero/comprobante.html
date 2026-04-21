@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Comprobante - {{ company_name }}{% endblock %}
+
+{% block content %}
+<style>
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  .card { border: none !important; box-shadow: none !important; margin: 0 !important; }
+  .container { max-width: 100% !important; padding: 15px !important; margin: 0 !important; }
+  body { font-size: 13px !important; line-height: 1.3 !important; margin: 0 !important; padding: 10px !important; }
+  h5, h6, p { margin-bottom: 0.3em !important; margin-top: 0.3em !important; }
+  .ticket-section { margin: 10px 0 !important; }
+  .ticket-divider { margin: 6px 0 !important; }
+  .comprobante-ticket { padding: 20px !important; max-width: 100% !important; }
+  table { font-size: 13px !important; }
+}
+@media screen {
+  .print-only { display: none !important; }
+}
+.comprobante-ticket {
+  font-family: 'Courier New', monospace;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border: 1px solid #eee;
+}
+.ticket-header {
+  text-align: center;
+  border-bottom: 2px dashed #000;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+.ticket-section {
+  margin: 12px 0;
+}
+.ticket-divider {
+  border-top: 1px dashed #000;
+  margin: 8px 0;
+}
+.ticket-total {
+  text-align: right;
+  font-weight: bold;
+}
+</style>
+
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-body">
+      <!-- Versión para pantalla -->
+      <div class="no-print">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0">Comprobante de Venta</h4>
+          <div>
+            <a href="javascript:window.print()" class="btn btn-primary"><i class="fas fa-print"></i> Imprimir Boleto</a>
+            <a href="{{ url_for('mis_boletos') }}" class="btn btn-outline-secondary">Volver</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Versión para impresión -->
+      <div class="comprobante-ticket">
+        <div class="ticket-header">
+          <h5 style="margin: 0; font-size: 16px;"><strong>{% if venta.tipo_comprobante == 'factura' %}FACTURA ELECTRÓNICA{% else %}BOLETA DE VENTA ELECTRÓNICA{% endif %}</strong></h5>
+          <div class="ticket-divider"></div>
+          <h6 style="margin: 0; font-size: 14px;"><strong>{{ company_ruc }}</strong></h6>
+          <h6 style="margin: 0; font-size: 14px;"><strong>{{ company_name|upper }}</strong></h6>
+          <h6 style="margin: 0; font-size: 12px;">{{ company_address|upper }}</h6>
+        </div>
+
+        <div class="ticket-section">
+          <div class="ticket-divider"></div>
+          <p style="margin: 0; font-size: 13px;"><strong>SUCURSAL 1 | TEL: 956181111</strong></p>
+          <div class="ticket-divider"></div>
+          <p style="margin: 0; font-size: 13px;">
+            <strong>{{ venta.fecha_compra.strftime('%d/%m/%Y') if venta.fecha_compra else '' }} {{ venta.fecha_compra.strftime('%H:%M') if venta.fecha_compra else '' }}</strong>
+          </p>
+          <p style="margin: 0; font-size: 13px;"><strong>N° {{ venta.tipo_comprobante|upper if venta.tipo_comprobante else 'BOLETA' }}: {{ venta_id[-8:]|upper }}</strong></p>
+          <div class="ticket-divider"></div>
+        </div>
+
+        <div class="ticket-section">
+          <p style="margin: 0; font-size: 13px;"><strong>CLIENTE: {{ venta.comprador_nombre|upper }}</strong></p>
+          <p style="margin: 0; font-size: 13px;"><strong>DNI: {{ venta.comprador_dni }}</strong></p>
+          {% if venta.tipo_comprobante == 'factura' %}
+          <p style="margin: 0; font-size: 13px;"><strong>RUC: {{ venta.ruc or '' }}</strong></p>
+          <p style="margin: 0; font-size: 12px;"><strong>{{ venta.razon_social|upper if venta.razon_social else '' }}</strong></p>
+          {% endif %}
+          <div class="ticket-divider"></div>
+        </div>
+
+        <div class="ticket-section">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <tr>
+              <td style="width: 25%;"><strong>CANTIDAD</strong></td>
+              <td style="width: 35%; text-align: center;"><strong>PRECIO UNITARIO</strong></td>
+              <td style="width: 40%; text-align: right;"><strong>P. TOTAL</strong></td>
+            </tr>
+          </table>
+          <div class="ticket-divider"></div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <tr>
+              <td style="width: 25%;">{{ venta.cantidad_boletos }}</td>
+              <td style="width: 35%; text-align: center;">{{ "%.2f"|format(venta.precio_unitario or (viaje.ruta.precio if viaje and viaje.ruta else 0)) }}</td>
+              <td style="width: 40%; text-align: right;">{{ "%.2f"|format(venta.total or 0) }}</td>
+            </tr>
+          </table>
+          <div class="ticket-divider"></div>
+        </div>
+
+        <div class="ticket-section">
+          <p style="margin: 0; font-size: 13px;"><strong>{% if venta.es_tramo_estandar %}{{ venta.origen_real|upper }} → {{ venta.destino_real|upper }}{% else %}{{ viaje.ruta.origen|upper if viaje and viaje.ruta else 'N/A' }} → {{ viaje.ruta.destino|upper if viaje and viaje.ruta else 'N/A' }}{% endif %}</strong></p>
+          {% if venta.es_tramo_estandar %}
+          <p style="margin: 0; font-size: 11px;"><em>(Tramo de ruta con paradas)</em></p>
+          {% endif %}
+          {% if viaje and viaje.fecha_salida %}
+          <p style="margin: 0; font-size: 12px;">FECHA: {{ viaje.fecha_salida.strftime('%d/%m/%Y') }} HORA: {{ viaje.hora_salida }}</p>
+          {% endif %}
+          <div class="ticket-divider"></div>
+        </div>
+
+        <div class="ticket-section">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <tr>
+              <td style="width: 50%; text-align: left;"><strong>OP. EXONERADA</strong></td>
+              <td style="width: 50%; text-align: right;">{{ "%.2f"|format((venta.total or 0) / 1.18) }}</td>
+            </tr>
+            <tr>
+              <td style="text-align: left;"><strong>IGV (18%)</strong></td>
+              <td style="text-align: right;">{{ "%.2f"|format(venta.igv or ((venta.total or 0) * 0.18)) }}</td>
+            </tr>
+            <tr>
+              <td style="text-align: left;"><strong>SUBTOTAL</strong></td>
+              <td style="text-align: right;">{{ "%.2f"|format((venta.total or 0) / 1.18) }}</td>
+            </tr>
+          </table>
+          <div class="ticket-divider"></div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <tr>
+              <td style="width: 50%; text-align: left;"><strong>TOTAL</strong></td>
+              <td style="width: 50%; text-align: right;"><strong>{{ "%.2f"|format(venta.total or 0) }}</strong></td>
+            </tr>
+            <tr>
+              <td style="text-align: left;"><strong>PAGO</strong></td>
+              <td style="text-align: right;">{{ "%.2f"|format(venta.total or 0) }}</td>
+            </tr>
+          </table>
+          <div class="ticket-divider"></div>
+        </div>
+
+        <div class="ticket-section">
+          <p style="margin: 0; font-size: 13px;"><strong>{{ venta.metodo_pago|upper if venta.metodo_pago else 'CONTADO' }}</strong></p>
+          <div class="ticket-divider"></div>
+        </div>
+
+        <div class="ticket-section text-center">
+          <p style="margin: 0; font-size: 12px;"><strong>ATENDIDO: J. MONDALGO - E. PADILLA</strong></p>
+          <div class="ticket-divider"></div>
+          <p style="margin: 0; font-size: 11px;"><em>"GRACIAS POR SU COMPRA"</em></p>
+          <p style="margin: 0; font-size: 10px;"><em>REPRESENTACIÓN IMPRESA DE {% if venta.tipo_comprobante == 'factura' %}FACTURA{% else %}BOLETA{% endif %} ELECTRÓNICA</em></p>
+          <p style="margin: 0; font-size: 10px;">{{ company_name }} - RUC: {{ company_ruc }}</p>
+        </div>
+      </div>
+
+      <!-- Botones solo para pantalla -->
+      <div class="no-print mt-3 text-center">
+        <a href="{{ url_for('mis_boletos') }}" class="btn btn-outline-secondary">Volver a Mis Boletos</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

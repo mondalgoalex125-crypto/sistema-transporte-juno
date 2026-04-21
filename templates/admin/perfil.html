@@ -1,0 +1,435 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Perfil - Admin - JUNO EXPRESS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar">
+            <div class="sidebar-header">
+                <h4><i class="fas fa-user-shield"></i> Panel Admin</h4>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_control_comercial') }}">
+                        <i class="fas fa-chart-line"></i> Control Comercial
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_rutas') }}">
+                        <i class="fas fa-route"></i> Gestión de Rutas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_precios_tramos') }}">
+                        <i class="fas fa-dollar-sign"></i> Precios por Tramo
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_planificacion') }}">
+                        <i class="fas fa-calendar-alt"></i> Planificación
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_atencion_cliente') }}">
+                        <i class="fas fa-headset"></i> Atención Cliente
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_usuarios') }}">
+                        <i class="fas fa-users"></i> Usuarios
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('admin_perfil') }}">
+                        <i class="fas fa-user-edit"></i> Mi Perfil
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 main-content">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-edit text-danger"></i> Mi Perfil de Administrador</h2>
+                <div class="user-info">
+                    <span class="badge bg-danger me-2">ADMIN</span>
+                    <span class="text-muted">{{ session.user_name }}</span>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm ms-2">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Profile Form -->
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0"><i class="fas fa-user-shield"></i> Información del Administrador</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="nombre" class="form-label">
+                                                <i class="fas fa-user"></i> Nombre *
+                                            </label>
+                                            <input type="text" class="form-control" id="nombre" name="nombre" 
+                                                   value="{{ user.nombre or '' }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="apellido" class="form-label">
+                                                <i class="fas fa-user"></i> Apellido *
+                                            </label>
+                                            <input type="text" class="form-control" id="apellido" name="apellido" 
+                                                   value="{{ user.apellido or '' }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">
+                                                <i class="fas fa-envelope"></i> Email Corporativo *
+                                            </label>
+                                            <input type="email" class="form-control" id="email" name="email" 
+                                                   value="{{ user.email or '' }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="telefono" class="form-label">
+                                                <i class="fas fa-phone"></i> Teléfono de Contacto
+                                            </label>
+                                            <input type="tel" class="form-control" id="telefono" name="telefono" 
+                                                   value="{{ user.telefono or '' }}" placeholder="999 999 999">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="rol" class="form-label">
+                                                <i class="fas fa-user-shield"></i> Nivel de Acceso
+                                            </label>
+                                            <input type="text" class="form-control" id="rol" name="rol" 
+                                                   value="Administrador" readonly>
+                                            <div class="form-text">Acceso completo al sistema</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <i class="fas fa-shield-alt"></i> Estado de Cuenta
+                                            </label>
+                                            <input type="text" class="form-control" readonly value="Administrador Activo">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <i class="fas fa-calendar-plus"></i> Fecha de Registro
+                                            </label>
+                                            <input type="text" class="form-control" readonly
+                                                   value="{{ user.fecha_registro | datetime }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <i class="fas fa-calendar-check"></i> Última Actualización
+                                            </label>
+                                            <input type="text" class="form-control" readonly
+                                                   value="{{ user.fecha_actualizacion | datetime if user.fecha_actualizacion else 'Nunca' }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-danger btn-lg">
+                                        <i class="fas fa-save"></i> Actualizar Perfil
+                                    </button>
+                                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary btn-lg ms-2">
+                                        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Admin Privileges Card -->
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0"><i class="fas fa-crown"></i> Privilegios de Administrador</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-check-circle text-success"></i> Permisos Activos:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success"></i> Gestión completa de rutas</li>
+                                        <li><i class="fas fa-check text-success"></i> Planificación de viajes</li>
+                                        <li><i class="fas fa-check text-success"></i> Control comercial y ventas</li>
+                                        <li><i class="fas fa-check text-success"></i> Atención al cliente</li>
+                                        <li><i class="fas fa-check text-success"></i> Administración de usuarios</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-shield-alt text-primary"></i> Información de Seguridad:</h6>
+                                    <p><strong>Último Acceso:</strong> {{ fecha_actual.strftime('%d/%m/%Y %H:%M') }}</p>
+                                    <p><strong>Sesiones Activas:</strong> <span class="badge bg-info">1</span></p>
+                                    <p><strong>Nivel de Seguridad:</strong> <span class="badge bg-success">Alto</span></p>
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#cambiarPasswordModal">
+                                        <i class="fas fa-lock"></i> Cambiar Contraseña
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Actions Card -->
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0"><i class="fas fa-cogs"></i> Acciones del Sistema</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-database text-info"></i> Gestión de Datos:</h6>
+                                    <a href="{{ url_for('admin_usuarios') }}" class="btn btn-outline-primary btn-sm me-2 mb-2">
+                                        <i class="fas fa-users"></i> Ver Usuarios
+                                    </a>
+                                    <a href="{{ url_for('exportar_usuarios_pdf') }}" class="btn btn-outline-info btn-sm me-2 mb-2" target="_blank">
+                                        <i class="fas fa-file-pdf"></i> Exportar Usuarios PDF
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-tools text-warning"></i> Herramientas:</h6>
+                                    <button class="btn btn-outline-warning btn-sm me-2 mb-2" onclick="alert('Funcionalidad próximamente')">
+                                        <i class="fas fa-chart-bar"></i> Reportes
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm me-2 mb-2" onclick="alert('Funcionalidad próximamente')">
+                                        <i class="fas fa-cog"></i> Configuración
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Cambiar Contraseña -->
+<div class="modal fade" id="cambiarPasswordModal" tabindex="-1" aria-labelledby="cambiarPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cambiarPasswordModalLabel">
+                    <i class="fas fa-lock"></i> Cambiar Contraseña de Administrador
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('cambiar_password') }}" method="POST" id="passwordForm">
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Importante:</strong> Estás cambiando la contraseña de una cuenta de administrador.
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_actual" class="form-label">
+                            <i class="fas fa-key"></i> Contraseña Actual *
+                        </label>
+                        <input type="password" class="form-control" id="password_actual" name="password_actual" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_nueva" class="form-label">
+                            <i class="fas fa-lock"></i> Nueva Contraseña *
+                        </label>
+                        <input type="password" class="form-control" id="password_nueva" name="password_nueva" 
+                               minlength="8" required>
+                        <div class="form-text">Mínimo 8 caracteres para cuentas de administrador</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_confirmar" class="form-label">
+                            <i class="fas fa-lock"></i> Confirmar Nueva Contraseña *
+                        </label>
+                        <input type="password" class="form-control" id="password_confirmar" name="password_confirmar" 
+                               minlength="8" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-save"></i> Cambiar Contraseña
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Admin Sidebar Styles */
+.sidebar {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    min-height: 100vh;
+    padding: 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+
+.sidebar-header h4 {
+    color: white;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.sidebar .nav-link {
+    color: rgba(255,255,255,0.8);
+    padding: 12px 20px;
+    border-radius: 0;
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border-left: 4px solid #ffc107;
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+}
+
+/* Main Content */
+.main-content {
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    border-bottom: none;
+}
+
+/* Form Styles */
+.form-control:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border: none;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c82333, #dc3545);
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        min-height: auto;
+    }
+    
+    .sidebar-footer {
+        position: relative;
+        bottom: auto;
+        margin-top: 20px;
+    }
+}
+</style>
+
+<script>
+// Validación de contraseñas en tiempo real
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordForm = document.getElementById('passwordForm');
+    const passwordNueva = document.getElementById('password_nueva');
+    const passwordConfirmar = document.getElementById('password_confirmar');
+    
+    function validarPasswords() {
+        if (passwordNueva.value && passwordConfirmar.value) {
+            if (passwordNueva.value === passwordConfirmar.value) {
+                passwordConfirmar.classList.remove('is-invalid');
+                passwordConfirmar.classList.add('is-valid');
+            } else {
+                passwordConfirmar.classList.remove('is-valid');
+                passwordConfirmar.classList.add('is-invalid');
+            }
+        } else {
+            passwordConfirmar.classList.remove('is-valid', 'is-invalid');
+        }
+    }
+    
+    passwordNueva.addEventListener('input', validarPasswords);
+    passwordConfirmar.addEventListener('input', validarPasswords);
+    
+    passwordForm.addEventListener('submit', function(e) {
+        if (passwordNueva.value !== passwordConfirmar.value) {
+            e.preventDefault();
+            alert('Las contraseñas no coinciden');
+        }
+    });
+});
+</script>
+{% endblock %}

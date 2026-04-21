@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - EMPRESA DE TRANSPORTE JUNO EXPRESS{% endblock %}
+
+{% block content %}
+<!-- Hero con imagen de fondo (estilo PerúBus, sin textos encima) -->
+<div class="hero-section"></div>
+
+<!-- Sección de Login Unificado -->
+<div class="login-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card login-card">
+                    <div class="card-body p-5 text-center">
+                        <i class="fas fa-users fa-5x text-primary mb-4"></i>
+                        <h2 class="card-title mb-3">Acceso al Sistema</h2>
+                        <p class="card-text mb-4">Bienvenido a Juno Express - Inicia sesión para acceder a nuestros servicios</p>
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                            </a>
+                            <a href="{{ url_for('registro') }}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> Registrarse
+                            </a>
+                        </div>
+                        <div class="mt-4">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                El sistema detectará automáticamente tu rol (Pasajero o Administrador)
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sección de Servicios -->
+<div class="services-section py-5 bg-light">
+    <div class="container">
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card service-card text-center h-100">
+                    <div class="card-body">
+                        <i class="fas fa-shield-alt fa-4x text-primary mb-3"></i>
+                        <h4 class="card-title">Viajes Seguros</h4>
+                        <p class="card-text">Unidades modernas con los más altos estándares de seguridad</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card service-card text-center h-100">
+                    <div class="card-body">
+                        <i class="fas fa-clock fa-4x text-success mb-3"></i>
+                        <h4 class="card-title">Puntualidad</h4>
+                        <p class="card-text">Salidas a tiempo y llegadas según lo programado</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card service-card text-center h-100">
+                    <div class="card-body">
+                        <i class="fas fa-headset fa-4x text-info mb-3"></i>
+                        <h4 class="card-title">Atención 24/7</h4>
+                        <p class="card-text">Soporte al cliente disponible en todo momento</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sección de Destinos con imágenes -->
+<div class="destinations-section py-5">
+    <div class="container">
+        <h3 class="text-center mb-5 section-title">
+            <i class="fas fa-map-marked-alt me-2"></i> Nuestros Destinos Principales
+        </h3>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="destination-card">
+                    <div class="destination-image chincha-bg">
+                        <div class="destination-overlay">
+                            <h4 class="destination-title">CHINCHA</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="destination-card">
+                    <div class="destination-image pisco-bg">
+                        <div class="destination-overlay">
+                            <h4 class="destination-title">PISCO</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="destination-card">
+                    <div class="destination-image ica-bg">
+                        <div class="destination-overlay">
+                            <h4 class="destination-title">ICA</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Hero Section */
+.hero-section {
+    height: 65vh;
+    background-image: url('/static/images/bus-hero.png');
+    background-size: cover;      /* estilo portada */
+    background-position: center; /* centra el bus */
+    background-attachment: scroll; /* imagen estática, no parallax */
+    background-repeat: no-repeat;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+    background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00, #C0C0C0, #808080);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+    font-family: 'Arial Black', Arial, sans-serif;
+    letter-spacing: 2px;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    font-weight: 300;
+}
+
+@keyframes titleGlow {
+    0% { 
+        filter: brightness(1) drop-shadow(0 0 10px rgba(255,215,0,0.3)); 
+        transform: scale(1);
+    }
+    50% { 
+        filter: brightness(1.3) drop-shadow(0 0 25px rgba(255,165,0,0.6)); 
+        transform: scale(1.02);
+    }
+    100% { 
+        filter: brightness(1) drop-shadow(0 0 10px rgba(255,215,0,0.3)); 
+        transform: scale(1);
+    }
+}
+
+/* Login Section */
+.login-section {
+    background: linear-gradient(180deg, #f7f7f7, #fff3e0); /* plomo claro -> naranja claro */
+}
+
+.login-card {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+/* Services Section */
+.service-card {
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-3px);
+}
+
+/* Destinations Section */
+.destinations-section {
+    background: linear-gradient(135deg, #fff, #f8f9fa);
+}
+
+.section-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    background: linear-gradient(45deg, #FFD700, #FFA500, #808080);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.destination-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.destination-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.destination-image {
+    height: 260px;                /* mismo alto */
+    background-size: cover;       /* recorte elegante tipo card */
+    background-position: center;  /* foco centrado */
+    border-radius: 15px;
+    position: relative;
+}
+
+.destination-overlay {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 16px 18px;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.75) 100%);
+}
+
+/* Backgrounds para los destinos */
+.chincha-bg {
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                url('/static/images/chincha.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.pisco-bg {
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                url('/static/images/pisco.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.ica-bg {
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                url('/static/images/ica.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.destination-title {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 900;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+/* Animaciones */
+.card {
+    animation: fadeInUp 0.6s ease;
+}
+
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .destination-image {
+        height: 250px;
+    }
+}
+</style>
+
+<!-- Sin JS: las imágenes se cargan desde CSS para mantenerlas limpias -->
+{% endblock %}

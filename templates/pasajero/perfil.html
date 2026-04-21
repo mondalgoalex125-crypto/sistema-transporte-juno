@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Perfil - JUNO EXPRESS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar">
+            <div class="sidebar-header">
+                <h4><i class="fas fa-user"></i> Panel de Pasajero</h4>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('pasajero_dashboard') }}">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('buscar_viajes') }}">
+                        <i class="fas fa-search"></i> Buscar Viajes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('mis_boletos') }}">
+                        <i class="fas fa-ticket-alt"></i> Mis Boletos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('mis_consultas') }}">
+                        <i class="fas fa-headset"></i> Atención al Cliente
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('pasajero_perfil') }}">
+                        <i class="fas fa-user-edit"></i> Mi Perfil
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 main-content">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-edit text-primary"></i> Mi Perfil</h2>
+                <div class="user-info">
+                    <span class="text-muted">Bienvenido, {{ session.user_name }}</span>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm ms-2">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Profile Form -->
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-user-circle"></i> Información Personal</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="nombre" class="form-label">
+                                                <i class="fas fa-user"></i> Nombre *
+                                            </label>
+                                            <input type="text" class="form-control" id="nombre" name="nombre" 
+                                                   value="{{ user.nombre or '' }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="apellido" class="form-label">
+                                                <i class="fas fa-user"></i> Apellido *
+                                            </label>
+                                            <input type="text" class="form-control" id="apellido" name="apellido" 
+                                                   value="{{ user.apellido or '' }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">
+                                                <i class="fas fa-envelope"></i> Email *
+                                            </label>
+                                            <input type="email" class="form-control" id="email" name="email" 
+                                                   value="{{ user.email or '' }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="telefono" class="form-label">
+                                                <i class="fas fa-phone"></i> Teléfono
+                                            </label>
+                                            <input type="tel" class="form-control" id="telefono" name="telefono" 
+                                                   value="{{ user.telefono or '' }}" placeholder="999 999 999">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="rol" class="form-label">
+                                                <i class="fas fa-user-tag"></i> Tipo de Usuario
+                                            </label>
+                                            <input type="text" class="form-control" id="rol" name="rol" 
+                                                   value="{{ user.rol.title() if user.rol else 'Pasajero' }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <i class="fas fa-shield-alt"></i> Estado de Cuenta
+                                            </label>
+                                            <input type="text" class="form-control" readonly value="Activa">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <i class="fas fa-calendar-plus"></i> Fecha de Registro
+                                            </label>
+                                            <input type="text" class="form-control" readonly
+                                                   value="{{ user.fecha_registro | datetime }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <i class="fas fa-calendar-check"></i> Última Actualización
+                                            </label>
+                                            <input type="text" class="form-control" readonly
+                                                   value="{{ user.fecha_actualizacion | datetime if user.fecha_actualizacion else 'Nunca' }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save"></i> Actualizar Perfil
+                                    </button>
+                                    <a href="{{ url_for('pasajero_dashboard') }}" class="btn btn-secondary btn-lg ms-2">
+                                        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Additional Info Card -->
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información de Seguridad</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong><i class="fas fa-shield-alt text-success"></i> Cuenta Verificada:</strong> 
+                                       <span class="badge bg-success">Sí</span></p>
+                                    <p><strong><i class="fas fa-lock text-primary"></i> Contraseña:</strong> 
+                                       <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#cambiarPasswordModal">
+                                           Cambiar Contraseña
+                                       </button></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong><i class="fas fa-history text-info"></i> Último Acceso:</strong> 
+                                       {{ fecha_actual.strftime('%d/%m/%Y %H:%M') }}</p>
+                                    <p><strong><i class="fas fa-ticket-alt text-warning"></i> Boletos Comprados:</strong> 
+                                       <span class="badge bg-warning">{{ user.total_boletos or 0 }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Cambiar Contraseña -->
+<div class="modal fade" id="cambiarPasswordModal" tabindex="-1" aria-labelledby="cambiarPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="cambiarPasswordModalLabel">
+                    <i class="fas fa-lock"></i> Cambiar Contraseña
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('cambiar_password') }}" method="POST" id="passwordForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="password_actual" class="form-label">
+                            <i class="fas fa-key"></i> Contraseña Actual *
+                        </label>
+                        <input type="password" class="form-control" id="password_actual" name="password_actual" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_nueva" class="form-label">
+                            <i class="fas fa-lock"></i> Nueva Contraseña *
+                        </label>
+                        <input type="password" class="form-control" id="password_nueva" name="password_nueva" 
+                               minlength="6" required>
+                        <div class="form-text">Mínimo 6 caracteres</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_confirmar" class="form-label">
+                            <i class="fas fa-lock"></i> Confirmar Nueva Contraseña *
+                        </label>
+                        <input type="password" class="form-control" id="password_confirmar" name="password_confirmar" 
+                               minlength="6" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Cambiar Contraseña
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Sidebar Styles */
+.sidebar {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    min-height: 100vh;
+    padding: 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+
+.sidebar-header h4 {
+    color: white;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.sidebar .nav-link {
+    color: rgba(255,255,255,0.8);
+    padding: 12px 20px;
+    border-radius: 0;
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border-left: 4px solid #ffc107;
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+}
+
+/* Main Content */
+.main-content {
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    border-bottom: none;
+}
+
+/* Form Styles */
+.form-control:focus {
+    border-color: #1e3c72;
+    box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2a5298, #1e3c72);
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        min-height: auto;
+    }
+    
+    .sidebar-footer {
+        position: relative;
+        bottom: auto;
+        margin-top: 20px;
+    }
+}
+</style>
+
+<script>
+// Validación de contraseñas en tiempo real
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordForm = document.getElementById('passwordForm');
+    const passwordNueva = document.getElementById('password_nueva');
+    const passwordConfirmar = document.getElementById('password_confirmar');
+    
+    function validarPasswords() {
+        if (passwordNueva.value && passwordConfirmar.value) {
+            if (passwordNueva.value === passwordConfirmar.value) {
+                passwordConfirmar.classList.remove('is-invalid');
+                passwordConfirmar.classList.add('is-valid');
+            } else {
+                passwordConfirmar.classList.remove('is-valid');
+                passwordConfirmar.classList.add('is-invalid');
+            }
+        } else {
+            passwordConfirmar.classList.remove('is-valid', 'is-invalid');
+        }
+    }
+    
+    passwordNueva.addEventListener('input', validarPasswords);
+    passwordConfirmar.addEventListener('input', validarPasswords);
+    
+    passwordForm.addEventListener('submit', function(e) {
+        if (passwordNueva.value !== passwordConfirmar.value) {
+            e.preventDefault();
+            alert('Las contraseñas no coinciden');
+        }
+    });
+});
+</script>
+{% endblock %}

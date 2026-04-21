@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Control Comercial - Sistema de Transporte{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar fade-in">
+                <h5 class="mb-3"><i class="fas fa-user-shield"></i> Panel de Admin</h5>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_planificacion') }}">
+                        <i class="fas fa-calendar-alt"></i> Planificación
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_rutas') }}">
+                        <i class="fas fa-route"></i> Gestión de Rutas
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_precios_tramos') }}">
+                        <i class="fas fa-dollar-sign"></i> Precios por Tramo
+                    </a>
+                    <a class="nav-link active" href="{{ url_for('admin_control_comercial') }}">
+                        <i class="fas fa-chart-line"></i> Control Comercial
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_atencion_cliente') }}">
+                        <i class="fas fa-headset"></i> Atención al Cliente
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_usuarios') }}">
+                        <i class="fas fa-users"></i> Usuarios
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_perfil') }}">
+                        <i class="fas fa-user-edit"></i> Mi Perfil
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="content-wrapper fade-in">
+                <h2 class="mb-4">
+                    <i class="fas fa-chart-line"></i> Control Comercial
+                </h2>
+
+                <!-- Estadísticas del Día y Mes -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-1">Ingresos Hoy</p>
+                                    <h3>S/. {{ "%.2f"|format(ingresos_hoy) }}</h3>
+                                </div>
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-1">Boletos Hoy</p>
+                                    <h3>{{ boletos_hoy }}</h3>
+                                </div>
+                                <i class="fas fa-ticket-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-1">Ingresos del Mes</p>
+                                    <h3>S/. {{ "%.2f"|format(ingresos_mes) }}</h3>
+                                </div>
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Ventas -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Registro de Ventas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="ventasTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Ruta</th>
+                                        <th>Fecha Viaje</th>
+                                        <th>Fecha Compra</th>
+                                        <th>Boletos</th>
+                                        <th>Método Pago</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for venta in ventas %}
+                                    <tr>
+                                        <td>#{{ venta.id }}</td>
+                                        <td>
+                                            {% if venta.cliente %}
+                                                <i class="fas fa-user"></i> {{ venta.cliente.nombre }}<br>
+                                                <small class="text-muted">{{ venta.cliente.email }}</small>
+                                            {% else %}
+                                                <i class="fas fa-user"></i> <span class="text-muted">Cliente no disponible</span><br>
+                                                <small class="text-muted">N/A</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if venta.viaje and venta.viaje.ruta %}
+                                                <strong>{{ venta.viaje.ruta.origen }}</strong> → 
+                                                <strong>{{ venta.viaje.ruta.destino }}</strong>
+                                            {% else %}
+                                                <span class="text-muted">Viaje no disponible</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if venta.viaje and venta.viaje.fecha_salida and venta.viaje.fecha_salida != 'N/A' %}
+                                                {{ venta.viaje.fecha_salida }}<br>
+                                                <small>{{ venta.viaje.hora_salida or 'N/A' }}</small>
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if venta.fecha_compra %}
+                                                {{ venta.fecha_compra }}
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><span class="badge bg-info">{{ venta.cantidad_boletos }}</span></td>
+                                        <td>{{ venta.metodo_pago|capitalize }}</td>
+                                        <td><strong class="text-success">S/. {{ "%.2f"|format(venta.total) }}</strong></td>
+                                        <td>
+                                            {% if venta.estado == 'confirmado' %}
+                                                <span class="badge bg-success">Confirmado</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Cancelado</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #ventasTable {
+        font-size: 0.9rem;
+    }
+    
+    #ventasTable th {
+        background-color: #f8f9fa;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+</style>
+{% endblock %}

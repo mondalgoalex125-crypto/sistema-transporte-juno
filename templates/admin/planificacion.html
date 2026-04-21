@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}Planificación de Viajes - Sistema de Transporte{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar fade-in">
+                <h5 class="mb-3"><i class="fas fa-user-shield"></i> Panel de Admin</h5>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                    <a class="nav-link active" href="{{ url_for('admin_planificacion') }}">
+                        <i class="fas fa-calendar-alt"></i> Planificación
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_rutas') }}">
+                        <i class="fas fa-route"></i> Gestión de Rutas
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_precios_tramos') }}">
+                        <i class="fas fa-dollar-sign"></i> Precios por Tramo
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_control_comercial') }}">
+                        <i class="fas fa-chart-line"></i> Control Comercial
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_atencion_cliente') }}">
+                        <i class="fas fa-headset"></i> Atención al Cliente
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_usuarios') }}">
+                        <i class="fas fa-users"></i> Usuarios
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_perfil') }}">
+                        <i class="fas fa-user-edit"></i> Mi Perfil
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="content-wrapper fade-in">
+                <h2 class="mb-4">
+                    <i class="fas fa-calendar-alt"></i> Planificación de Viajes
+                </h2>
+
+                <!-- Formulario Crear Viaje -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus-circle"></i> Programar Nuevo Viaje
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('crear_viaje') }}">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="ruta_id" class="form-label">
+                                        <i class="fas fa-route"></i> Ruta
+                                    </label>
+                                    <select class="form-select" id="ruta_id" name="ruta_id" required>
+                                        <option value="">Seleccionar ruta...</option>
+                                        {% for ruta in rutas %}
+                                            <option value="{{ ruta.id }}">
+                                                {% if ruta.tipo == 'estandar' %}
+                                                    ⭐ {{ ruta.origen }} → {{ ruta.destino }} (S/. {{ "%.2f"|format(ruta.precio) }}) - CON PARADAS
+                                                {% elif ruta.activa %}
+                                                    ✅ {{ ruta.origen }} → {{ ruta.destino }} (S/. {{ "%.2f"|format(ruta.precio) }}) - ACTIVA
+                                                {% else %}
+                                                    ⚫ {{ ruta.origen }} → {{ ruta.destino }} (S/. {{ "%.2f"|format(ruta.precio) }}) - INACTIVA
+                                                {% endif %}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="fecha_salida" class="form-label">
+                                        <i class="fas fa-calendar"></i> Fecha de Salida
+                                    </label>
+                                    <input type="date" class="form-control" id="fecha_salida" name="fecha_salida" required>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="hora_salida" class="form-label">
+                                        <i class="fas fa-clock"></i> Hora de Salida
+                                    </label>
+                                    <input type="time" class="form-control" id="hora_salida" name="hora_salida" required>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="bus_numero" class="form-label">
+                                        <i class="fas fa-bus"></i> Bus
+                                    </label>
+                                    <select class="form-select" id="bus_numero" name="bus_numero" required>
+                                        <option value="">Seleccionar bus...</option>
+                                        <option value="Bus 1">Bus 1</option>
+                                        <option value="Bus 2">Bus 2</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="asientos_totales" class="form-label">
+                                        <i class="fas fa-chair"></i> Asientos Totales
+                                    </label>
+                                    <input type="number" class="form-control" id="asientos_totales" 
+                                           name="asientos_totales" value="40" min="1" max="60" required>
+                                </div>
+
+                                <div class="col-md-6 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="fas fa-check"></i> Programar Viaje
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-route"></i> Todas las Rutas Disponibles</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for ruta in rutas %}
+                                <div class="col-md-6 mb-3">
+                                    {% if ruta.tipo == 'estandar' %}
+                                    <div class="border border-warning rounded p-3 h-100 d-flex justify-content-between align-items-center" style="background-color: #fff8e1;">
+                                        <div>
+                                            <div><strong>⭐ {{ ruta.origen }}</strong> → <strong>{{ ruta.destino }}</strong></div>
+                                            <small class="text-warning"><strong>CON PARADAS</strong> · Precio: S/. {{ "%.2f"|format(ruta.precio or 0) }} · {{ ruta.duracion or '-' }}</small>
+                                        </div>
+                                        <button class="btn btn-sm btn-warning" type="button" onclick="prefillRuta('{{ruta.id }}')">
+                                            <i class="fas fa-plus-circle"></i> Programar
+                                        </button>
+                                    </div>
+                                    {% elif ruta.activa %}
+                                    <div class="border border-success rounded p-3 h-100 d-flex justify-content-between align-items-center" style="background-color: #f0f9ff;">
+                                        <div>
+                                            <div><strong>✅ {{ ruta.origen }}</strong> → <strong>{{ ruta.destino }}</strong></div>
+                                            <small class="text-success"><strong>ACTIVA</strong> · Precio: S/. {{ "%.2f"|format(ruta.precio or 0) }} · {{ ruta.duracion or '-' }}</small>
+                                        </div>
+                                        <button class="btn btn-sm btn-success" type="button" onclick="prefillRuta('{{ruta.id }}')">
+                                            <i class="fas fa-plus-circle"></i> Programar
+                                        </button>
+                                    </div>
+                                    {% else %}
+                                    <div class="border border-secondary rounded p-3 h-100 d-flex justify-content-between align-items-center" style="background-color: #f8f9fa;">
+                                        <div>
+                                            <div><strong>⚫ {{ ruta.origen }}</strong> → <strong>{{ ruta.destino }}</strong></div>
+                                            <small class="text-muted"><strong>INACTIVA</strong> · Precio: S/. {{ "%.2f"|format(ruta.precio or 0) }} · {{ ruta.duracion or '-' }}</small>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary" type="button" onclick="prefillRuta('{{ruta.id }}')">
+                                            <i class="fas fa-plus-circle"></i> Programar
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Viajes Programados -->
+                
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Viajes Programados
+                        </h5>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Ruta</th>
+                                        <th>Fecha Salida</th>
+                                        <th>Hora</th>
+                                        <th>Bus</th>
+                                        <th>Asientos</th>
+                                        <th>Estado</th>
+                                        <th>Ocupación</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for viaje in viajes %}
+                                    <tr>
+                                        <td>#{{ viaje.id }}</td>
+                                        <td>
+                                            <strong>{{ viaje.ruta.origen }}</strong> → <strong>{{ viaje.ruta.destino }}</strong>
+                                        </td>
+                                        <td>{{ viaje.fecha_salida.strftime('%d/%m/%Y') }}</td>
+                                        <td>{{ viaje.hora_salida }}</td>
+                                        <td>
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-bus"></i> {{ viaje.bus_numero or 'N/A' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                {{ viaje.asientos_disponibles }}/{{ viaje.asientos_totales }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if viaje.estado == 'programado' %}
+                                                <span class="badge bg-primary">Programado</span>
+                                            {% elif viaje.estado == 'en_curso' %}
+                                                <span class="badge bg-warning">En Curso</span>
+                                            {% elif viaje.estado == 'completado' %}
+                                                <span class="badge bg-success">Completado</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Cancelado</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% set ocupacion = ((viaje.asientos_totales - viaje.asientos_disponibles) / viaje.asientos_totales * 100)|int %}
+                                            {% if ocupacion < 50 %}
+                                                {% set barra_clase = 'bg-danger' %}
+                                            {% elif ocupacion < 80 %}
+                                                {% set barra_clase = 'bg-warning' %}
+                                            {% else %}
+                                                {% set barra_clase = 'bg-success' %}
+                                            {% endif %}
+                                            <div class="progress" style="height: 25px;">
+                                                <div class="progress-bar {{ barra_clase }}" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-ocupacion="{{ ocupacion }}" style="width: 0%;">
+                                                    {{ ocupacion }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <form method="POST" action="{{ url_for('eliminar_viaje', viaje_id=viaje.id) }}">
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fas fa-trash"></i> Eliminar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Establecer fecha mínima como hoy
+        document.getElementById('fecha_salida').min = new Date().toISOString().split('T')[0];
+        function prefillRuta(id) {
+            const sel = document.getElementById('ruta_id');
+            sel.value = id;
+            document.getElementById('fecha_salida').focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        // Si viene ?ruta= en la URL, preseleccionar
+        (function(){
+            const params = new URLSearchParams(window.location.search);
+            const rid = params.get('ruta');
+            if (rid) {
+                const sel = document.getElementById('ruta_id');
+                if (sel) sel.value = rid;
+                const f = document.getElementById('fecha_salida');
+                if (f) f.focus();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        })();
+
+        // Establecer anchos de barras de progreso desde data-ocupacion (evita Jinja en CSS inline)
+        (function(){
+            const bars = document.querySelectorAll('.progress-bar[data-ocupacion]');
+            bars.forEach(function(el){
+                const v = parseInt(el.getAttribute('data-ocupacion'), 10) || 0;
+                el.style.width = v + '%';
+                el.setAttribute('aria-valuenow', String(v));
+            });
+        })();
+    </script>
+{% endblock %}

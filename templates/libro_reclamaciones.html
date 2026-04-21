@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Libro de Reclamaciones - JUNO EXPRESS{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+  <div class="card shadow border-0">
+    <div class="card-body p-4">
+
+      <!-- ENCABEZADO -->
+      <div class="text-center mb-4">
+        <h3 class="fw-bold">Libro de Reclamaciones</h3>
+        <p class="text-muted mb-0">Conforme a lo establecido por INDECOPI</p>
+      </div>
+
+      <!-- DATOS DEL PROVEEDOR -->
+      <div class="border rounded p-3 mb-4 bg-light">
+        <h6 class="fw-bold mb-3">Identificación del Proveedor</h6>
+        <div class="row">
+          <div class="col-md-3"><strong>RUC:</strong> 20601935181</div>
+          <div class="col-md-5"><strong>Razón Social:</strong> EMPRESA DE TRANSPORTE JUNO EXPRES S.A</div>
+          <div class="col-md-4"><strong>Dirección:</strong> Av. Artemio Molina - Pueblo Nuevo</div>
+        </div>
+      </div>
+
+      <form method="POST" action="{{ url_for('enviar_reclamacion') }}">
+
+        <!-- IDENTIFICACIÓN DEL CONSUMIDOR -->
+        <h6 class="fw-bold mt-3">1. Identificación del Consumidor</h6>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Nombres *</label>
+            <input type="text" class="form-control" name="nombres" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Apellidos *</label>
+            <input type="text" class="form-control" name="apellidos" required>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Tipo de Documento *</label>
+            <select class="form-select" name="tipo_doc" required>
+              <option>DNI</option>
+              <option>CE</option>
+              <option>Pasaporte</option>
+            </select>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label">N° Documento *</label>
+            <input type="text" class="form-control" name="num_doc" required>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Teléfono</label>
+            <input type="text" class="form-control" name="telefono">
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Correo Electrónico *</label>
+            <input type="email" class="form-control" name="correo" required>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Dirección</label>
+            <input type="text" class="form-control" name="direccion">
+          </div>
+        </div>
+
+        <!-- BIEN CONTRATADO -->
+        <h6 class="fw-bold mt-4">2. Identificación del Bien Contratado</h6>
+        <div class="mb-3">
+          <input type="radio" name="bien" value="Servicio" checked> Servicio
+          <input type="radio" name="bien" value="Producto" class="ms-3"> Producto
+        </div>
+
+        <!-- TIPO -->
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Tipo *</label>
+            <select class="form-select" name="tipo" required>
+              <option>Reclamo</option>
+              <option>Queja</option>
+            </select>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Monto</label>
+            <input type="number" class="form-control" name="monto">
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label">N° Boleta/Factura *</label>
+            <input type="text" class="form-control" name="comprobante" required>
+          </div>
+        </div>
+
+        <!-- DETALLE -->
+        <div class="mb-3">
+          <label class="form-label">Detalle *</label>
+          <textarea class="form-control" name="detalle" rows="4" required></textarea>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Pedido del Consumidor *</label>
+          <textarea class="form-control" name="pedido" rows="3" required></textarea>
+        </div>
+
+        <!-- INFORMACIÓN LEGAL -->
+        <div class="alert alert-warning small">
+          <strong>Importante:</strong><br>
+          La respuesta será enviada al correo electrónico consignado.<br><br>
+          1. La formulación del reclamo no impide acudir a otras vías ante INDECOPI.<br>
+          2. El proveedor responderá en un plazo máximo de 15 días hábiles.
+        </div>
+
+        <!-- BOTÓN -->
+        <div class="text-center">
+          <button class="btn btn-danger px-5">
+            <i class="fas fa-paper-plane me-2"></i> Enviar
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

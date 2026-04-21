@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Atención al Cliente - Sistema de Transporte{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar fade-in">
+                <h5 class="mb-3"><i class="fas fa-user-shield"></i> Panel de Admin</h5>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_planificacion') }}">
+                        <i class="fas fa-calendar-alt"></i> Planificación
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_rutas') }}">
+                        <i class="fas fa-route"></i> Gestión de Rutas
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_precios_tramos') }}">
+                        <i class="fas fa-dollar-sign"></i> Precios por Tramo
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_control_comercial') }}">
+                        <i class="fas fa-chart-line"></i> Control Comercial
+                    </a>
+                    <a class="nav-link active" href="{{ url_for('admin_atencion_cliente') }}">
+                        <i class="fas fa-headset"></i> Atención al Cliente
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_usuarios') }}">
+                        <i class="fas fa-users"></i> Usuarios
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_perfil') }}">
+                        <i class="fas fa-user-edit"></i> Mi Perfil
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="content-wrapper fade-in">
+                <h2 class="mb-4">
+                    <i class="fas fa-headset"></i> Atención al Cliente
+                </h2>
+
+                <!-- Filtros -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary active" onclick="filtrarConsultas('todas')">
+                                <i class="fas fa-list"></i> Todas
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" onclick="filtrarConsultas('pendiente')">
+                                <i class="fas fa-clock"></i> Pendientes
+                            </button>
+                            <button type="button" class="btn btn-outline-success" onclick="filtrarConsultas('respondida')">
+                                <i class="fas fa-check"></i> Respondidas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Consultas -->
+                {% if consultas %}
+                    {% for consulta in consultas %}
+                    <div class="card mb-3 consulta-item" data-estado="{{ consulta.estado }}">
+                        <div class="card-header {% if consulta.estado == 'respondida' %}bg-success{% else %}bg-warning{% endif %} text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-envelope"></i> {{ consulta.asunto }}
+                                </h5>
+                                <div>
+                                    {% if consulta.estado == 'respondida' %}
+                                        <span class="badge bg-light text-success">Respondida</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-warning">Pendiente</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1">
+                                        <i class="fas fa-user"></i> <strong>Cliente:</strong> {{ consulta.usuario.nombre }}
+                                    </p>
+                                    <p class="mb-1">
+                                        <i class="fas fa-envelope"></i> {{ consulta.usuario.email }}
+                                    </p>
+                                    <p class="mb-0">
+                                        <i class="fas fa-phone"></i> {{ consulta.usuario.telefono }}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <p class="mb-1">
+                                        <i class="fas fa-calendar"></i> 
+                                        {{ consulta.fecha_consulta.strftime('%d/%m/%Y %H:%M') }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-light">
+                                <strong><i class="fas fa-comment"></i> Mensaje del cliente:</strong>
+                                <p class="mb-0 mt-2">{{ consulta.mensaje }}</p>
+                            </div>
+
+                            {% if consulta.respuesta %}
+                                <div class="alert alert-success">
+                                    <strong><i class="fas fa-reply"></i> Tu respuesta:</strong>
+                                    <small class="text-muted float-end">
+                                        {{ consulta.fecha_respuesta.strftime('%d/%m/%Y %H:%M') }}
+                                    </small>
+                                    <p class="mb-0 mt-2">{{ consulta.respuesta }}</p>
+                                </div>
+                            {% else %}
+                                <form method="POST" action="{{ url_for('responder_consulta', consulta_id=consulta.id) }}">
+                                    <div class="mb-3">
+                                        <label for="respuesta_{{ consulta.id }}" class="form-label">
+                                            <i class="fas fa-reply"></i> Responder Consulta
+                                        </label>
+                                        <textarea class="form-control" id="respuesta_{{ consulta.id }}" 
+                                                  name="respuesta" rows="3" required 
+                                                  placeholder="Escribe tu respuesta aquí..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-paper-plane"></i> Enviar Respuesta
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-comments fa-5x text-muted mb-4"></i>
+                    <h4 class="text-muted">No hay consultas registradas</h4>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filtrarConsultas(estado) {
+        const consultas = document.querySelectorAll('.consulta-item');
+        const botones = document.querySelectorAll('.btn-group button');
+        
+        // Actualizar botones activos
+        botones.forEach(btn => btn.classList.remove('active'));
+        event.target.closest('button').classList.add('active');
+        
+        // Filtrar consultas
+        consultas.forEach(consulta => {
+            if (estado === 'todas' || consulta.dataset.estado === estado) {
+                consulta.style.display = 'block';
+            } else {
+                consulta.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

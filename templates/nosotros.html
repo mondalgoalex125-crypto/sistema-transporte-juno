@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Nosotros - JUNO EXPRESS{% endblock %}
+{% block content %}
+
+<style>
+  .juno-nosotros { font-family: 'Segoe UI', sans-serif; }
+  .juno-nosotros h2.titulo-seccion {
+    font-size: 2rem; font-weight: 700; color: #7a1c1c; margin-bottom: 4px;
+  }
+  .linea-deco { width: 60px; height: 3px; background: #7a1c1c; margin: 0 auto 1.5rem; border-radius: 2px; }
+  .tag-label {
+    display: inline-block; background: #f9eded; color: #7a1c1c;
+    border-radius: 6px; font-size: 12px; font-weight: 600;
+    padding: 3px 12px; letter-spacing: 0.5px; margin-bottom: 10px;
+  }
+  .mv-card { border-top: 3px solid #7a1c1c; border-radius: 12px; }
+  .valor-icon-circle {
+    width: 70px; height: 70px; background: #7a1c1c;
+    border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; margin: 0 auto 10px;
+  }
+  .valor-icon-circle i { font-size: 1.6rem; color: #fff; }
+  .valor-label { font-size: 13px; font-weight: 600; color: #555; }
+</style>
+
+<div class="container juno-nosotros py-5">
+
+  <!-- HISTORIA -->
+  <div class="text-center mb-5">
+    <span class="tag-label">Quiénes somos</span>
+    <h2 class="titulo-seccion">Somos Juno Express</h2>
+    <p class="text-muted fst-italic mb-2">Historia y compromiso</p>
+    <div class="linea-deco"></div>
+    <p class="mx-auto text-muted" style="max-width:680px; line-height:1.8;">
+      En el año 2017, la empresa de transporte Junno Express nació en Chincha como una iniciativa familiar para mejorar la movilidad entre ciudades cercanas. 
+      Con una pequeña flota de buses, comenzó ofreciendo rutas hacia Pisco e Ica, ganándose la confianza de los pasajeros por su puntualidad.
+      Poco a poco, su compromiso con la seguridad y el buen trato hizo que más personas eligieran sus servicios. A pesar de los desafíos iniciales, 
+      la empresa logró consolidarse en la región. Con el tiempo, Junno Express se convirtió en una opción reconocida en el transporte interprovincial del sur chico.
+    </p>
+    <div class="mt-4 rounded-3 overflow-hidden shadow-sm" style="max-width:680px; margin:0 auto;">
+      <img src="/static/images/nosotros1.png" alt="Equipo Juno Express"
+           class="img-fluid w-100" style="height:280px; object-fit:cover;">
+    </div>
+  </div>
+
+  <hr class="my-4 opacity-25">
+
+  <!-- MISIÓN Y VISIÓN -->
+  <div class="text-center mb-5">
+    <span class="tag-label">Propósito</span>
+    <h2 class="titulo-seccion">Misión y Visión</h2>
+    <div class="linea-deco"></div>
+    <div class="row justify-content-center g-3 mb-4" style="max-width:680px; margin:0 auto;">
+      <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm p-3 mv-card">
+          <div class="card-body text-start">
+            <p class="text-uppercase fw-bold mb-1" style="font-size:11px; letter-spacing:1.5px; color:#7a1c1c;">Misión</p>
+            <h5 class="mb-2" style="color:#7a1c1c;">¿Por qué existimos?</h5>
+            <p class="text-muted" style="font-size:14px; line-height:1.7;">
+              Brindar un servicio de transporte interprovincial seguro, puntual y accesible, conectando Chincha, Pisco e Ica, 
+              garantizando la satisfacción de nuestros pasajeros mediante un trato cordial y unidades en óptimas condiciones.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm p-3 mv-card">
+          <div class="card-body text-start">
+            <p class="text-uppercase fw-bold mb-1" style="font-size:11px; letter-spacing:1.5px; color:#7a1c1c;">Visión</p>
+            <h5 class="mb-2" style="color:#7a1c1c;">¿A dónde vamos?</h5>
+            <p class="text-muted" style="font-size:14px; line-height:1.7;">
+              Ser una empresa líder en el transporte interprovincial del sur del Perú, reconocida por su calidad de servicio, 
+              innovación y compromiso con la seguridad, ampliando nuestras rutas y mejorando continuamente la experiencia de viaje de nuestros clientes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="rounded-3 overflow-hidden shadow-sm" style="max-width:680px; margin:0 auto;">
+      <img src="/static/images/nosotros2.png" alt="Operaciones Juno Express"
+           class="img-fluid w-100" style="height:260px; object-fit:cover;">
+    </div>
+  </div>
+
+  <hr class="my-4 opacity-25">
+
+  <!-- VALORES -->
+  <div class="text-center pb-4">
+    <span class="tag-label">Lo que nos define</span>
+    <h2 class="titulo-seccion">Nuestros Valores</h2>
+    <div class="linea-deco"></div>
+    <div class="d-flex flex-wrap justify-content-center gap-4 mt-3">
+
+      <div class="valor-item text-center" style="width:100px;">
+        <div class="valor-icon-circle"><i class="fas fa-heart-circle-check"></i></div>
+        <p class="valor-label mb-0">Honestidad</p>
+      </div>
+
+      <div class="valor-item text-center" style="width:100px;">
+        <div class="valor-icon-circle"><i class="fas fa-clock"></i></div>
+        <p class="valor-label mb-0">Puntualidad</p>
+      </div>
+
+      <div class="valor-item text-center" style="width:100px;">
+        <div class="valor-icon-circle"><i class="fas fa-shield-halved"></i></div>
+        <p class="valor-label mb-0">Responsabilidad</p>
+      </div>
+
+      <div class="valor-item text-center" style="width:100px;">
+        <div class="valor-icon-circle"><i class="fas fa-people-group"></i></div>
+        <p class="valor-label mb-0">Trabajo en equipo</p>
+      </div>
+
+      <div class="valor-item text-center" style="width:100px;">
+        <div class="valor-icon-circle"><i class="fas fa-star"></i></div>
+        <p class="valor-label mb-0">Compromiso</p>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

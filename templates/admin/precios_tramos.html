@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Precios por Tramo - Sistema de Transporte{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar fade-in">
+                <h5 class="mb-3"><i class="fas fa-user-shield"></i> Panel de Admin</h5>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_planificacion') }}">
+                        <i class="fas fa-calendar-alt"></i> Planificación
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_rutas') }}">
+                        <i class="fas fa-route"></i> Gestión de Rutas
+                    </a>
+                    <a class="nav-link active" href="{{ url_for('admin_precios_tramos') }}">
+                        <i class="fas fa-dollar-sign"></i> Precios por Tramo
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_control_comercial') }}">
+                        <i class="fas fa-chart-line"></i> Control Comercial
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_atencion_cliente') }}">
+                        <i class="fas fa-headset"></i> Atención al Cliente
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_usuarios') }}">
+                        <i class="fas fa-users"></i> Usuarios
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_perfil') }}">
+                        <i class="fas fa-user-edit"></i> Mi Perfil
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="content-wrapper fade-in">
+                <h2 class="mb-4">
+                    <i class="fas fa-dollar-sign"></i> Gestión de Precios por Tramo
+                </h2>
+
+                <div class="alert alert-info" style="border-left: 4px solid #17a2b8;">
+                    <h6><i class="fas fa-info-circle"></i> Información</h6>
+                    <p class="mb-0">
+                        Define aquí los precios manuales para cada tramo de ruta. Estos precios se usarán al generar rutas con paradas.
+                        Esto te permite ajustar los precios según el alza de combustible u otros factores.
+                    </p>
+                </div>
+
+                <!-- Formulario Nuevo Precio -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Definir Precio de Tramo</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('admin_precios_tramos') }}">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="origen" class="form-label">
+                                        <i class="fas fa-map-marker-alt text-success"></i> Origen
+                                    </label>
+                                    <select class="form-select" id="origen" name="origen" required>
+                                        <option value="">Seleccionar origen...</option>
+                                        {% for c in ciudades_juno %}
+                                        <option value="{{ c }}">{{ c }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="destino" class="form-label">
+                                        <i class="fas fa-map-marker-alt text-danger"></i> Destino
+                                    </label>
+                                    <select class="form-select" id="destino" name="destino" required>
+                                        <option value="">Seleccionar destino...</option>
+                                        {% for c in ciudades_juno %}
+                                        <option value="{{ c }}">{{ c }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="precio" class="form-label">
+                                        <i class="fas fa-dollar-sign"></i> Precio (S/.)
+                                    </label>
+                                    <input type="number" class="form-control" id="precio" name="precio" 
+                                           step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Guardar Precio
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Lista de Precios Definidos -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Precios Definidos por Tramo
+                        </h5>
+                        <button class="btn btn-sm btn-warning" onclick="actualizarPreciosRutas()">
+                            <i class="fas fa-sync-alt"></i> Actualizar Rutas con Precios Manuales
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        {% if precios %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Origen</th>
+                                        <th>Destino</th>
+                                        <th>Precio</th>
+                                        <th>Última Actualización</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for p in precios %}
+                                    <tr>
+                                        <td><strong>{{ p.origen }}</strong></td>
+                                        <td><strong>{{ p.destino }}</strong></td>
+                                        <td>
+                                            <span class="badge bg-success fs-6">S/. {{ "%.2f"|format(p.precio) }}</span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                {% if p.fecha_actualizacion %}
+                                                    {{ p.fecha_actualizacion[:10] }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <form method="POST" action="{{ url_for('eliminar_precio_tramo', precio_id=p.id) }}" 
+                                                  onsubmit="return confirm('¿Eliminar este precio?');">
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-dollar-sign fa-4x text-muted mb-3"></i>
+                            <h5 class="text-muted">No hay precios definidos</h5>
+                            <p class="text-muted">Define los precios de los tramos arriba</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Instrucciones -->
+                <div class="card mt-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Instrucciones</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol>
+                            <li>Define los precios para cada tramo posible (ej: Chincha → Pisco, Pisco → Ica, etc.)</li>
+                            <li><strong>IMPORTANTE:</strong> Después de definir los precios, haz clic en el botón amarillo <strong>"Actualizar Rutas con Precios Manuales"</strong> arriba</li>
+                            <li>Esto actualizará todas las rutas existentes con los nuevos precios que definiste</li>
+                            <li>Los pasajeros verán los precios actualizados al comprar boletos</li>
+                            <li>Si no defines un precio para un tramo, se usará el precio por defecto del sistema</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <script>
+                function actualizarPreciosRutas() {
+                    if (!confirm('¿Actualizar todas las rutas existentes con los precios manuales definidos?\n\nEsto modificará los precios de las rutas ya creadas para usar los precios que definiste arriba.')) {
+                        return;
+                    }
+                    
+                    const btn = event.target;
+                    const textoOriginal = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Actualizando...';
+                    btn.disabled = true;
+                    
+                    fetch('/admin/actualizar-precios-rutas', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        btn.innerHTML = textoOriginal;
+                        btn.disabled = false;
+                        
+                        if (data.success) {
+                            alert(`¡Precios actualizados exitosamente!\n\n` +
+                                  `✅ Rutas actualizadas: ${data.rutas_actualizadas}\n` +
+                                  `ℹ️ Rutas sin cambios: ${data.rutas_no_actualizadas}\n\n` +
+                                  `Los precios de las rutas ahora coinciden con los precios manuales definidos.`);
+                            location.reload();
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        btn.innerHTML = textoOriginal;
+                        btn.disabled = false;
+                        console.error('Error:', error);
+                        alert('Error: ' + error.message);
+                    });
+                }
+                </script>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

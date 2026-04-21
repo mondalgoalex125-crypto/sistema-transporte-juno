@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Rutas - Sistema de Transporte{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar fade-in">
+                <h5 class="mb-3"><i class="fas fa-user-shield"></i> Panel de Admin</h5>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_planificacion') }}">
+                        <i class="fas fa-calendar-alt"></i> Planificación
+                    </a>
+                    <a class="nav-link active" href="{{ url_for('admin_rutas') }}">
+                        <i class="fas fa-route"></i> Gestión de Rutas
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_precios_tramos') }}">
+                        <i class="fas fa-dollar-sign"></i> Precios por Tramo
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_control_comercial') }}">
+                        <i class="fas fa-chart-line"></i> Control Comercial
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_atencion_cliente') }}">
+                        <i class="fas fa-headset"></i> Atención al Cliente
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_usuarios') }}">
+                        <i class="fas fa-users"></i> Usuarios
+                    </a>
+                    <a class="nav-link" href="{{ url_for('admin_perfil') }}">
+                        <i class="fas fa-user-edit"></i> Mi Perfil
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="content-wrapper fade-in">
+                <h2 class="mb-4">
+                    <i class="fas fa-route"></i> Gestión de Rutas
+                </h2>
+
+                <!-- Formulario Nueva Ruta -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Crear Nueva Ruta</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('admin_rutas') }}" id="rutaForm">
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                        <i class="fas fa-map-marker-alt text-success"></i> Origen
+                                    </label>
+                                    <select class="form-select mb-2" id="origen_sel" onchange="document.getElementById('origen').value=this.value; autoPrecio();">
+                                        <option value="">Seleccionar (JUNO)</option>
+                                        {% for c in ciudades_juno %}
+                                        <option value="{{ c }}">{{ c }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <input type="text" class="form-control" id="origen" name="origen" placeholder="Origen manual" required>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-map-marker-alt text-danger"></i> Destino
+                                    </label>
+                                    <select class="form-select mb-2" id="destino_sel" onchange="document.getElementById('destino').value=this.value; autoPrecio();">
+                                        <option value="">Seleccionar (JUNO)</option>
+                                        {% for c in ciudades_juno %}
+                                        <option value="{{ c }}">{{ c }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <input type="text" class="form-control" id="destino" name="destino" placeholder="Destino manual" required>
+                                </div>
+
+                                <div class="col-md-2 mb-3">
+                                    <label for="precio" class="form-label">
+                                        <i class="fas fa-dollar-sign"></i> Precio (S/.)
+                                    </label>
+                                    <input type="number" class="form-control" id="precio" name="precio" 
+                                           step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+
+                                <div class="col-md-2 mb-3">
+                                    <label for="duracion" class="form-label">
+                                        <i class="fas fa-clock"></i> Duración
+                                    </label>
+                                    <input type="text" class="form-control" id="duracion" name="duracion" 
+                                           placeholder="{{ duracion_default }}" required>
+                                </div>
+
+                                <div class="col-md-2 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="fas fa-check"></i> Crear Ruta
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <hr>
+                        <div class="d-flex gap-2">
+                            <form method="POST" action="{{ url_for('seed_rutas_juno') }}">
+                                <button type="submit" class="btn btn-outline-success">
+                                    <i class="fas fa-seedling"></i> Cargar rutas JUNO EXPRESS
+                                </button>
+                            </form>
+                            <button type="button" class="btn btn-warning" onclick="generarYPlanificarRutaEstandar()">
+                                <i class="fas fa-magic"></i> Generar y Planificar Ruta con Paradas
+                            </button>
+                            <button type="button" class="btn btn-info" onclick="corregirEstadoRutas()">
+                                <i class="fas fa-wrench"></i> Corregir Estados
+                            </button>
+                        </div>
+                        <script id="precios-juno-data" type="application/json">{{ precios_juno|tojson }}</script>
+                        <script id="duracion-default-data" type="application/json">{{ duracion_default|tojson }}</script>
+                        <script>
+                            const preciosJuno = JSON.parse(document.getElementById('precios-juno-data').textContent);
+                            const duracionDefault = JSON.parse(document.getElementById('duracion-default-data').textContent);
+                            function autoPrecio() {
+                              const o = document.getElementById('origen').value.trim();
+                              const d = document.getElementById('destino').value.trim();
+                              const key = `${o}::${d}`;
+                              if (preciosJuno[key] !== undefined) {
+                                  document.getElementById('precio').value = preciosJuno[key];
+                                  if (!document.getElementById('duracion').value) {
+                                      document.getElementById('duracion').value = duracionDefault;
+                                  }
+                              }
+                          }
+                          document.getElementById('origen').addEventListener('input', autoPrecio);
+                          document.getElementById('destino').addEventListener('input', autoPrecio);
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Lista de Rutas -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Rutas Disponibles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for ruta in rutas %}
+                            <div class="col-md-6 mb-4">
+                                {% if ruta.tipo == 'estandar' %}
+                                <div class="card border-warning h-100" style="box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);">
+                                <div class="card-header bg-warning text-dark">
+                                {% elif ruta.activa %}
+                                <div class="card border-success h-100">
+                                <div class="card-header bg-success text-white">
+                                {% else %}
+                                <div class="card border-danger h-100">
+                                <div class="card-header bg-secondary text-white">
+                                {% endif %}
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">
+                                                {% if ruta.tipo == 'estandar' %}
+                                                <i class="fas fa-star"></i> Ruta #{{ ruta.id }}
+                                                {% else %}
+                                                <i class="fas fa-route"></i> Ruta #{{ ruta.id }}
+                                                {% endif %}
+                                            </h5>
+                                            {% if ruta.tipo == 'estandar' %}
+                                                <span class="badge bg-dark text-warning">
+                                                    <i class="fas fa-bus-alt"></i> CON PARADAS
+                                                </span>
+                                            {% elif ruta.activa %}
+                                                <span class="badge bg-light text-success">Activa</span>
+                                            {% else %}
+                                                <span class="badge bg-light text-danger">Inactiva</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <p class="mb-0">
+                                                    <i class="fas fa-map-marker-alt text-success"></i>
+                                                    <strong>Origen:</strong>
+                                                </p>
+                                                <h5 class="text-success">{{ ruta.origen }}</h5>
+                                            </div>
+                                            <div class="col-6 text-end">
+                                                <p class="mb-0">
+                                                    <i class="fas fa-map-marker-alt text-danger"></i>
+                                                    <strong>Destino:</strong>
+                                                </p>
+                                                <h5 class="text-danger">{{ ruta.destino }}</h5>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        {% if ruta.tipo == 'estandar' %}
+                                        <div class="alert alert-warning mb-3" style="border-left: 4px solid #ffc107;">
+                                            <small>
+                                                <i class="fas fa-info-circle"></i>
+                                                <strong>Ruta con Paradas:</strong> Parte de {{ ruta.ruta_padre or 'Chincha-Ica' }}
+                                                <br>
+                                                <i class="fas fa-bus"></i> Un solo bus atiende múltiples tramos
+                                            </small>
+                                        </div>
+                                        {% endif %}
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <p class="mb-2">
+                                                    <i class="fas fa-dollar-sign text-success"></i>
+                                                    <strong>Precio:</strong>
+                                                </p>
+                                                <h4 class="text-success">S/. {{ "%.2f"|format(ruta.precio) }}</h4>
+                                            </div>
+                                            <div class="col-6">
+                                                <p class="mb-2">
+                                                    <i class="fas fa-clock text-info"></i>
+                                                    <strong>Duración:</strong>
+                                                </p>
+                                                <h5>{{ ruta.duracion }}</h5>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-bus"></i> 
+                                                {{ ruta.viajes|length }} viaje(s) programado(s)
+                                            </small>
+                                            <div class="btn-group">
+                                                <a class="btn btn-sm btn-primary" href="{{ url_for('admin_planificacion') }}?ruta={{ ruta.id }}">
+                                                    <i class="fas fa-plus-circle"></i> Programar
+                                                </a>
+                                                <form method="POST" action="{{ url_for('eliminar_ruta', ruta_id=ruta.id) }}" onsubmit="return confirm('¿Eliminar esta ruta y sus viajes asociados?');">
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash"></i> Eliminar
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Leyenda de colores -->
+                        <div class="mt-4">
+                            <h6><i class="fas fa-palette"></i> Leyenda de Rutas:</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="badge bg-warning text-dark me-2">
+                                            <i class="fas fa-bus-alt"></i> CON PARADAS
+                                        </div>
+                                        <small>Rutas con paradas intermedias</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="badge bg-success me-2">Activa</div>
+                                        <small>Rutas normales disponibles</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="badge bg-secondary me-2">Inactiva</div>
+                                        <small>Rutas temporalmente deshabilitadas</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+function generarYPlanificarRutaEstandar() {
+    const fechaManana = new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0];
+    
+    if (!confirm(`¿Generar y planificar automáticamente la ruta con paradas Chincha-Ica?\n\n` +
+                 `⚠️ Se usarán los PRECIOS MANUALES definidos en "Precios por Tramo"\n` +
+                 `Si no hay precios definidos, se usarán precios por defecto\n\n` +
+                 `PASO 1: Se crearán los tramos con precios manuales\n` +
+                 `PASO 2: Se programará viaje para mañana (${fechaManana})\n\n` +
+                 `Horarios automáticos:\n` +
+                 `• 06:15 - Salida de Chincha\n` +
+                 `• 06:50 - Llegada a Pisco\n` +
+                 `• 07:30 - Llegada a Barrio Chino\n` +
+                 `• 08:15 - Llegada a Ica\n\n` +
+                 `Bus: Bus 1\n\n` +
+                 `💡 Define los precios en "Gestión de Precios por Tramo" antes de generar.`)) {
+        return;
+    }
+    
+    const boton = event.target;
+    const textoOriginal = boton.innerHTML;
+    boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando y Planificando...';
+    boton.disabled = true;
+    
+    // Paso 1: Generar rutas con paradas usando precios manuales
+    fetch('/admin/generar-ruta-paradas-manual', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            origen: 'Chincha',
+            destino: 'Ica',
+            duracion: '2 horas'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Paso 2: Planificar viaje automáticamente
+            return fetch('/admin/planificar-ruta-estandar-completa', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fecha: fechaManana,
+                    hora_salida: '06:15',
+                    bus_numero: 'Bus 1'
+                })
+            });
+        } else {
+            throw new Error(data.message || 'Error generando rutas');
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        boton.innerHTML = textoOriginal;
+        boton.disabled = false;
+        
+        if (data.success) {
+            alert(`¡Ruta con paradas generada y planificada exitosamente!\n\n` +
+                  `✅ Los precios usados son los definidos manualmente por el admin\n` +
+                  `✅ VIAJE PROGRAMADO:\n` +
+                  `Fecha: ${fechaManana}\n` +
+                  `Bus: Bus 1\n` +
+                  `Horario: 06:15 - 08:15\n\n` +
+                  `¡Los pasajeros ya pueden comprar boletos de cualquier tramo!`);
+            // Redirigir a planificación para ver el viaje creado
+            window.location.href = '/admin/planificacion';
+        } else {
+            alert('Error planificando viaje: ' + data.message);
+        }
+    })
+    .catch(error => {
+        boton.innerHTML = textoOriginal;
+        boton.disabled = false;
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+    });
+}
+
+function corregirEstadoRutas() {
+    if (!confirm('¿Corregir el estado de todas las rutas? Las rutas sin viajes programados se marcarán como inactivas.')) {
+        return;
+    }
+    
+    const boton = event.target;
+    const textoOriginal = boton.innerHTML;
+    boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Corrigiendo...';
+    boton.disabled = true;
+    
+    fetch('/admin/corregir-estado-rutas', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        boton.innerHTML = textoOriginal;
+        boton.disabled = false;
+        
+        if (data.success) {
+            alert(`¡Estados corregidos!\n\nSe actualizaron ${data.rutas_corregidas} rutas.\n\n• Rutas con viajes: ACTIVAS (verde)\n• Rutas sin viajes: INACTIVAS (gris)`);
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        boton.innerHTML = textoOriginal;
+        boton.disabled = false;
+        console.error('Error:', error);
+        alert('Error al corregir estados de rutas');
+    });
+}
+</script>
+{% endblock %}

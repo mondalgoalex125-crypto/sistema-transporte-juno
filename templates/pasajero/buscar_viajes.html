@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}Buscar Viajes - Sistema de Transporte{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar fade-in">
+                <h5 class="mb-3"><i class="fas fa-user-circle"></i> Panel de Pasajero</h5>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{{ url_for('pasajero_dashboard') }}">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                    <a class="nav-link active" href="{{ url_for('buscar_viajes') }}">
+                        <i class="fas fa-search"></i> Buscar Viajes
+                    </a>
+                    <a class="nav-link" href="{{ url_for('mis_boletos') }}">
+                        <i class="fas fa-ticket-alt"></i> Mis Boletos
+                    </a>
+                    <a class="nav-link" href="{{ url_for('mis_consultas') }}">
+                        <i class="fas fa-comments"></i> Atención al Cliente
+                    </a>
+                    <a class="nav-link" href="{{ url_for('pasajero_perfil') }}">
+                        <i class="fas fa-user-edit"></i> Mi Perfil
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="content-wrapper fade-in">
+                <h2 class="mb-4">
+                    <i class="fas fa-search"></i> Buscar Viajes
+                </h2>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('buscar_viajes') }}">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-map-marker-alt text-success"></i> Origen
+                                    </label>
+                                    <select class="form-select mb-2" id="origen_sel" onchange="document.getElementById('origen').value=this.value;">
+                                        <option value="">Seleccionar (JUNO)</option>
+                                        {% for c in ciudades_juno or [] %}
+                                        <option value="{{ c }}">{{ c }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <input type="text" class="form-control" id="origen" name="origen" placeholder="Origen manual">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-map-marker-alt text-danger"></i>Destino
+                                    </label>
+                                    <select class="form-select mb-2" id="destino_sel" onchange="document.getElementById('destino').value=this.value;">
+                                        <option value="">Seleccionar (JUNO)</option>
+                                        {% for c in ciudades_juno or [] %}
+                                        <option value="{{ c }}">{{ c }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <input type="text" class="form-control" id="destino" name="destino" placeholder="Destino manual">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="fecha" class="form-label">
+                                        <i class="fas fa-calendar"></i> Fecha
+                                    </label>
+                                    <input type="date" class="form-control" id="fecha" name="fecha">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Buscar Viajes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Resultados -->
+                {% if viajes %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-list"></i> Viajes Disponibles ({{ viajes|length }})
+                    </h4>
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="me-2 mb-0">Ordenar por:</label>
+                        <select id="sortSelect" class="form-select form-select-sm" style="width:auto;">
+                            <option value="fecha">Fecha</option>
+                            <option value="precio">Precio</option>
+                            <option value="asientos">Asientos disponibles</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <strong class="me-2">Filtrar por ciudad:</strong>
+                        {% for c in ciudades_juno or [] %}
+                        <button type="button" class="btn btn-sm btn-outline-secondary city-chip" data-city="{{ c }}">{{ c }}</button>
+                        {% endfor %}
+                        <button type="button" class="btn btn-sm btn-outline-dark city-chip" data-city="">Todos</button>
+                    </div>
+                </div>
+                <div class="row" id="viajesGrid">
+                    {% for viaje in viajes %}
+                    <div class="col-md-6 mb-4 viaje-item"
+                         data-precio="{{ viaje.ruta.precio or 0 }}" 
+                         data-fecha="{{ viaje.fecha_salida.strftime('%Y-%m-%d') if viaje.fecha_salida else '' }}"
+                         data-asientos="{{ viaje.asientos_disponibles or 0 }}">
+                        {% if viaje.tipo_viaje == 'estandar' %}
+                        <div class="card h-100 border-warning">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-bus-alt"></i> Ruta con Paradas
+                                    <span class="badge bg-dark text-warning ms-2">
+                                        <i class="fas fa-magic"></i> MÚLTIPLES DESTINOS
+                                    </span>
+                                </h5>
+                            </div>
+                        {% else %}
+                        <div class="card h-100 border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-bus"></i> {{ viaje.ruta.origen }} → {{ viaje.ruta.destino }}
+                                </h5>
+                            </div>
+                        {% endif %}
+                            <div class="card-body">
+                                {% if viaje.tipo_viaje == 'estandar' %}
+                                <div class="mb-3">
+                                    <p class="mb-2">
+                                        <i class="fas fa-calendar text-warning"></i>
+                                        <strong>Fecha:</strong> {% if viaje.fecha_salida %}{{ viaje.fecha_salida.strftime('%d/%m/%Y') }}{% else %}-{% endif %}
+                                    </p>
+                                    <p class="mb-2">
+                                        <i class="fas fa-clock text-warning"></i>
+                                        <strong>Salida:</strong> {{ viaje.hora_salida }} desde Chincha
+                                    </p>
+                                    <div class="alert alert-warning mb-3" style="border-left: 4px solid #ffc107;">
+                                        <small>
+                                            <i class="fas fa-route"></i>
+                                            <strong>Recorrido completo:</strong> Chincha → Pisco → Barrio Chino → Ica
+                                            <br>
+                                            <i class="fas fa-info-circle"></i>
+                                            Al comprar, podrás elegir tu tramo específico con horarios
+                                        </small>
+                                    </div>
+                                    <p class="mb-2">
+                                        <i class="fas fa-chair text-secondary"></i>
+                                        <strong>Asientos disponibles:</strong> 
+                                        <span class="badge bg-info">{{ viaje.asientos_disponibles }}/{{ viaje.asientos_totales }}</span>
+                                    </p>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <small class="text-muted">Precios desde:</small>
+                                        <h3 class="text-success mb-0">
+                                            <i class="fas fa-dollar-sign"></i> S/. 5.00
+                                        </h3>
+                                    </div>
+                                    <a href="{{ url_for('comprar_boleto', viaje_id=viaje.id) }}" 
+                                       class="btn btn-warning text-dark">
+                                        <i class="fas fa-route"></i> Elegir Tramo
+                                    </a>
+                                </div>
+                                {% else %}
+                                <div class="mb-3">
+                                    <p class="mb-2">
+                                        <i class="fas fa-calendar text-primary"></i>
+                                        <strong>Fecha:</strong> {% if viaje.fecha_salida %}{{ viaje.fecha_salida.strftime('%d/%m/%Y') }}{% else %}-{% endif %}
+                                    </p>
+                                    <p class="mb-2">
+                                        <i class="fas fa-clock text-info"></i>
+                                        <strong>Hora:</strong> {{ viaje.hora_salida }}
+                                    </p>
+                                    <p class="mb-2">
+                                        <i class="fas fa-hourglass-half text-warning"></i>
+                                        <strong>Duración:</strong> {{ viaje.ruta.duracion }}
+                                    </p>
+                                    <p class="mb-2">
+                                        <i class="fas fa-chair text-secondary"></i>
+                                        <strong>Asientos disponibles:</strong> 
+                                        <span class="badge bg-info">{{ viaje.asientos_disponibles }}/{{ viaje.asientos_totales }}</span>
+                                    </p>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h3 class="text-success mb-0">
+                                        <i class="fas fa-dollar-sign"></i> S/. {{ "%.2f"|format(viaje.ruta.precio) }}
+                                    </h3>
+                                    <a href="{{ url_for('comprar_boleto', viaje_id=viaje.id) }}" 
+                                       class="btn btn-success">
+                                        <i class="fas fa-shopping-cart"></i> Comprar
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <script>
+                    // Ordenamiento simple en el cliente
+                    const grid = document.getElementById('viajesGrid');
+                    const sel = document.getElementById('sortSelect');
+                    const chips = document.querySelectorAll('.city-chip');
+                    let cityFilter = '';
+                    function sortCards() {
+                        const items = Array.from(grid.querySelectorAll('.viaje-item'));
+                        const by = sel.value;
+                        const filtered = items.filter(it=>{
+                            if (!cityFilter) return true;
+                            const title = it.querySelector('.card-header h5').textContent.toLowerCase();
+                            return title.includes(cityFilter.toLowerCase());
+                        });
+                        filtered.sort((a,b)=>{
+                            if (by==='precio') return parseFloat(a.dataset.precio)-parseFloat(b.dataset.precio);
+                            if (by==='asientos') return parseInt(b.dataset.asientos)-parseInt(a.dataset.asientos);
+                            // fecha asc
+                            return (a.dataset.fecha||'') > (b.dataset.fecha||'') ? 1 : -1;
+                        });
+                        // hide all then show sorted filtered
+                        items.forEach(it=>it.style.display='none');
+                        filtered.forEach(it=>{ it.style.display=''; grid.appendChild(it); });
+                    }
+                    sel.addEventListener('change', sortCards);
+                    chips.forEach(btn=>btn.addEventListener('click', ()=>{ cityFilter = btn.dataset.city; sortCards(); }));
+                    sortCards();
+                </script>
+                {% elif request.method == 'POST' %}
+                <div class="alert alert-warning text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                    <h4>No se encontraron viajes</h4>
+                    <p>Intenta con otros criterios de búsqueda</p>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-bus fa-5x text-muted mb-3"></i>
+                    <h4 class="text-muted">No hay viajes programados ahora. Revisa las rutas activas:</h4>
+                </div>
+                <div class="row">
+                    {% for r in rutas %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary text-white">
+                                <i class="fas fa-route"></i> {{ r.origen }} → {{ r.destino }}
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2"><strong>Precio:</strong> S/. {{ "%.2f"|format(r.precio or 0) }}</p>
+                                <p class="mb-0"><strong>Duración:</strong> {{ r.duracion or '-' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

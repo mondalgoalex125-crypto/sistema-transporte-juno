@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Nuestras Oficinas - JUNO EXPRESS{% endblock %}
+{% block content %}
+
+<style>
+  .of-wrap { font-family: 'Segoe UI', sans-serif; padding: 2rem 1rem; }
+  .of-title { text-align: center; margin-bottom: 1.5rem; }
+  .of-title h2 { font-size: 2rem; font-weight: 700; color: #7a1c1c; margin-bottom: 4px; }
+  .of-title p { color: #6c757d; font-size: 15px; }
+  .linea { width: 55px; height: 3px; background: #7a1c1c; margin: 8px auto 0; border-radius: 2px; }
+  .tabs { display: flex; justify-content: center; gap: 14px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .tab-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 28px; border-radius: 30px; border: 2px solid #7a1c1c;
+    background: transparent; color: #7a1c1c; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tab-btn:hover { background: #f9eded; }
+  .tab-btn.active { background: #7a1c1c; color: #fff; }
+  .map-shell { border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+  .map-shell iframe { width: 100%; height: 440px; border: none; display: block; }
+  .info-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; background: #fff; border-top: 1px solid #e9ecef;
+    flex-wrap: wrap; gap: 10px;
+  }
+  .city-badge {
+    background: #7a1c1c; color: #fff; border-radius: 20px;
+    padding: 4px 16px; font-size: 13px; font-weight: 700;
+  }
+  .city-addr { font-size: 13px; color: #6c757d; }
+  .maps-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #7a1c1c; color: #fff !important; border-radius: 8px;
+    padding: 8px 20px; font-size: 13px; font-weight: 600; text-decoration: none;
+  }
+  .maps-btn:hover { opacity: 0.88; }
+</style>
+
+<div class="container of-wrap">
+  <div class="of-title">
+    <h2><i class="fas fa-map-marker-alt me-2"></i>Nuestras Oficinas</h2>
+    <p>Encuéntranos en nuestras sedes principales</p>
+    <div class="linea"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="setCity('chincha', this)">
+      <i class="fas fa-map-pin"></i> Chincha
+    </button>
+    <button class="tab-btn" onclick="setCity('pisco', this)">
+      <i class="fas fa-map-pin"></i> Pisco
+    </button>
+    <button class="tab-btn" onclick="setCity('ica', this)">
+      <i class="fas fa-map-pin"></i> Ica
+    </button>
+  </div>
+
+  <div class="map-shell">
+    <iframe id="map-frame"
+  src="https://www.google.com/maps/embed?pb=!4v1776650910789!6m8!1m7!1sVOSog1NxZ_n1kYqjjp_-KQ!2m2!1d-13.4172176066733!2d-76.1391104480821!3f262.93108150322996!4f-2.474458615510869!5f1.3291078365226046"
+  width="600" height="450" style="border:0;" allowfullscreen loading="lazy"
+  referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+    <div class="info-bar">
+      <div class="d-flex align-items-center gap-2">
+        <span class="city-badge" id="city-name">Chincha</span>
+        <span class="city-addr" id="city-addr">Av. Principal s/n, Chincha Alta</span>
+      </div>
+      <a id="maps-link" href="https://maps.app.goo.gl/UM3DQ5KXYwsgbxy49"
+         target="_blank" class="maps-btn">
+        <i class="fas fa-directions"></i> Ver en Google Maps
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+const cities = {
+  chincha: {
+    name: 'Chincha',
+    addr: 'Av. Principal s/n, Chincha Alta',
+    map: 'https://www.google.com/maps/embed?pb=!4v1776650910789!6m8!1m7!1sVOSog1NxZ_n1kYqjjp_-KQ!2m2!1d-13.4172176066733!2d-76.1391104480821!3f262.93108150322996!4f-2.474458615510869!5f1.3291078365226046',
+    link: 'https://maps.app.goo.gl/UM3DQ5KXYwsgbxy49'
+  },
+  pisco: {
+    name: 'Pisco',
+    addr: 'Av. Los Libertadores s/n, Pisco',
+    map: 'https://www.google.com/maps/embed?pb=!4v1776651397172!6m8!1m7!1s5Ks0U37nbmPUiqHXE9weLA!2m2!1d-13.71368161227817!2d-76.1534419279152!3f290.40585!4f0!5f0.7820865974627469',
+    link: 'https://maps.app.goo.gl/JWrcV21BQv4SsiHa8'
+  },
+  ica: {
+    name: 'Ica',
+    addr: 'Av. Grau s/n, Ica',
+    map: 'https://www.google.com/maps/embed?pb=!4v1776651622566!6m8!1m7!1sJen6aWGG3oxNws02-SeXVA!2m2!1d-14.06337948239762!2d-75.73218648937244!3f81.21114!4f0!5f0.7820865974627469',
+    link: 'https://maps.app.goo.gl/if8FW1gfdmPYQoZNA'
+  }
+};
+
+function setCity(key, btn) {
+  const c = cities[key];
+  document.getElementById('map-frame').src = c.map;
+  document.getElementById('city-name').textContent = c.name;
+  document.getElementById('city-addr').textContent = c.addr;
+  document.getElementById('maps-link').href = c.link;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+
+{% endblock %}
