@@ -1,76 +1,322 @@
 {% extends "base.html" %}
 
-{% block title %}Registro - Sistema de Transporte{% endblock %}
+{% block title %}Registro - JUNO EXPRESS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos personalizados específicos para la página de registro */
+    .register-container {
+        max-width: 1000px;
+        margin: 4rem auto;
+    }
+
+    .custom-card {
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    /* Panel Izquierdo: Mensaje de Bienvenida Destacado */
+    .welcome-panel {
+        background: linear-gradient(135deg, #db690b 0%, #ff8c00 100%);
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-panel::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        top: -100px;
+        left: -100px;
+    }
+
+    /* Contenedor de la Imagen Personalizada en el panel izquierdo */
+    .custom-welcome-img {
+        width: 90px;
+        height: 90px;
+        object-fit: cover; /* Evita que la imagen se deforme */
+        border-radius: 50%;
+        background-color: #ffffff;
+        padding: 5px; /* Efecto de borde blanco alrededor de la foto */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Panel Derecho: Ajustes del Formulario */
+    .form-panel {
+        padding: 3.5rem 3rem;
+    }
+
+    /* Personalización de inputs y enfoque basados en tu paleta */
+    .form-custom-group .form-label {
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-custom-group .form-label i {
+        color: #db690b;
+        margin-right: 4px;
+    }
+
+    .form-custom-control {
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    .form-custom-control:focus {
+        border-color: #db690b;
+        box-shadow: 0 0 0 4px rgba(219, 105, 11, 0.15);
+        outline: none;
+    }
+
+    /* Contenedor especial para el campo de contraseña con ojo */
+    .password-container {
+        position: relative;
+    }
+
+    .password-container .form-custom-control {
+        padding-right: 3rem; /* Espacio para que el texto no se monte en el ojo */
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #a0aec0;
+        cursor: pointer;
+        padding: 0 5px;
+        z-index: 10;
+        transition: color 0.2s ease;
+    }
+
+    .toggle-password:hover {
+        color: #db690b;
+    }
+
+    /* Botón Principal */
+    .btn-register-submit {
+        background: linear-gradient(135deg, #db690b 0%, #f17c1e 100%);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 12px;
+        padding: 0.8rem;
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(219, 105, 11, 0.2);
+    }
+
+    .btn-register-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(219, 105, 11, 0.35);
+    }
+
+    .btn-register-submit:active {
+        transform: translateY(0);
+    }
+
+    .login-link {
+        color: #db690b;
+        font-weight: 600;
+    }
+
+    .login-link:hover {
+        color: #b05105;
+        text-decoration: underline !important;
+    }
+
+    /* Ajustes para dispositivos móviles */
+    @media (max-width: 768px) {
+        .register-container {
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+        .welcome-panel {
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+        .welcome-panel::before {
+            display: none;
+        }
+        .form-panel {
+            padding: 2.5rem 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center fade-in">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-user-plus fa-4x text-success mb-3"></i>
-                        <h2 class="card-title">Crear Cuenta</h2>
-                        <p class="text-muted">Regístrate para comenzar a viajar</p>
+<div class="container register-container">
+    <div class="card custom-card fade-in">
+        <div class="row g-0">
+            
+            <!-- Panel Izquierdo: Bienvenida Visual de Impacto -->
+            <div class="col-lg-5 welcome-panel">
+                <div class="z-1 position-relative">
+                    
+                    <!-- DIRECCIÓN DE IMAGEN MANUAL: Modifica el src de abajo con tu foto -->
+                    <div class="mb-4 text-center text-lg-start">
+                        <img src="/static/images/registro_bus.png"
+                             alt="Logo Juno Express" 
+                             class="custom-welcome-img"
+                             onerror="this.onerror=null; this.src='https://placehold.co/90x90/ffffff/db690b?text=JUNO';">
                     </div>
-
-                    <form method="POST" action="{{ url_for('registro') }}">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="nombre" class="form-label">
-                                        <i class="fas fa-user"></i> Nombre *
-                                    </label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="apellido" class="form-label">
-                                        <i class="fas fa-user"></i> Apellido *
-                                    </label>
-                                    <input type="text" class="form-control" id="apellido" name="apellido" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="email" class="form-label">
-                                <i class="fas fa-envelope"></i> Correo Electrónico
-                            </label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="telefono" class="form-label">
-                                <i class="fas fa-phone"></i> Teléfono (opcional)
-                            </label>
-                            <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="999 999 999">
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="password" class="form-label">
-                                <i class="fas fa-lock"></i> Contraseña
-                            </label>
-                            <input type="password" class="form-control" id="password" name="password" required minlength="6">
-                            <small class="text-muted">Mínimo 6 caracteres</small>
-                        </div>
-
-                        <button type="submit" class="btn btn-success w-100 mb-3">
-                            <i class="fas fa-user-plus"></i> Registrarse
-                        </button>
-
-                        <div class="text-center">
-                            <p class="mb-0">¿Ya tienes cuenta? 
-                                <a href="{{ url_for('login') }}" class="text-decoration-none">
-                                    Inicia sesión aquí
-                                </a>
-                            </p>
-                        </div>
-                    </form>
+                    
+                    <h1 class="display-6 fw-bold mb-3">¡Tu próximo destino te espera!</h1>
+                    <p class="lead mb-4" style="opacity: 0.95;">Únete a la familia de <strong>Juno Express</strong> y empieza a disfrutar de viajes cómodos, puntuales y seguros por toda la región.</p>
+                    <div class="d-none d-lg-block mt-5 pt-4" style="opacity: 0.85; font-size: 0.9rem;">
+                        <p class="mb-2"><i class="fas fa-check-circle me-2"></i> Rutas diarias Chincha - Pisco - Ica</p>
+                        <p class="mb-0"><i class="fas fa-check-circle me-2"></i> Gestión de tus pasajes al instante</p>
+                    </div>
                 </div>
             </div>
+
+            <!-- Panel Derecho: Formulario de Registro Estilizado -->
+            <div class="col-lg-7 form-panel">
+                <div class="mb-4">
+                    <h2 class="fw-bold text-dark mb-1">Crear Cuenta</h2>
+                    <p class="text-muted">Regístrate en pocos segundos completando tus datos básicos.</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('registro') }}" id="registerForm">
+                    
+                    <!-- Fila: Nombre y Apellido -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3 form-custom-group">
+                            <label for="nombre" class="form-label">
+                                <i class="fas fa-user"></i> Nombre *
+                            </label>
+                            <input type="text" class="form-control form-custom-control" id="nombre" name="nombre" required placeholder="Ej. Juan">
+                        </div>
+                        <div class="col-md-6 mb-3 form-custom-group">
+                            <label for="apellido" class="form-label">
+                                <i class="fas fa-user"></i> Apellido *
+                            </label>
+                            <input type="text" class="form-control form-custom-control" id="apellido" name="apellido" required placeholder="Ej. Pérez">
+                        </div>
+                    </div>
+
+                    <!-- Input: Correo Electrónico -->
+                    <div class="mb-3 form-custom-group">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> Correo Electrónico *
+                        </label>
+                        <input type="email" class="form-control form-custom-control" id="email" name="email" required placeholder="ejemplo@correo.com">
+                    </div>
+
+                    <!-- Input: Teléfono -->
+                    <div class="mb-3 form-custom-group">
+                        <label for="telefono" class="form-label">
+                            <i class="fas fa-phone"></i> Teléfono <span class="text-muted fw-normal">(Opcional)</span>
+                        </label>
+                        <input type="tel" class="form-control form-custom-control" id="telefono" name="telefono" placeholder="999 999 999">
+                    </div>
+
+                    <!-- Fila de Contraseñas Duplicadas con Ojo -->
+                    <div class="row">
+                        <!-- Input: Contraseña 1 -->
+                        <div class="col-md-6 mb-3 form-custom-group">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock"></i> Contraseña *
+                            </label>
+                            <div class="password-container">
+                                <input type="password" class="form-control form-custom-control" id="password" name="password" required minlength="6" placeholder="Mínimo 6 caracteres">
+                                <button type="button" class="toggle-password" data-target="password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Input: Confirmar Contraseña -->
+                        <div class="col-md-6 mb-4 form-custom-group">
+                            <label for="confirm_password" class="form-label">
+                                <i class="fas fa-shield-alt"></i> Verificar Contraseña *
+                            </label>
+                            <div class="password-container">
+                                <input type="password" class="form-control form-custom-control" id="confirm_password" name="confirm_password" required minlength="6" placeholder="Repite tu contraseña">
+                                <button type="button" class="toggle-password" data-target="confirm_password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón de Envío -->
+                    <button type="submit" class="btn btn-register-submit w-100 mb-4 py-25">
+                        <i class="fas fa-user-plus me-2"></i> Registrarse e Iniciar Aventura
+                    </button>
+
+                    <!-- Enlace de Retorno al Login -->
+                    <div class="text-center">
+                        <p class="mb-0 text-muted">¿Ya tienes una cuenta activa? 
+                            <a href="{{ url_for('login') }}" class="text-decoration-none login-link">
+                                Inicia sesión aquí
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lógica para mostrar/ocultar contraseñas dinámicamente con el ojito
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+
+        // Validación básica en el cliente para asegurar que coincidan antes de enviar al backend
+        const form = document.getElementById('registerForm');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+
+        form.addEventListener('submit', function(event) {
+            if (password.value !== confirmPassword.value) {
+                event.preventDefault();
+                alert('Las contraseñas no coinciden. Por favor, verifícalas.');
+                confirmPassword.focus();
+            }
+        });
+    });
+</script>
 {% endblock %}
