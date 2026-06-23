@@ -26,6 +26,51 @@
             min-height: 100vh;
         }
 
+        /* Dark Mode Global Styles */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%) !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .navbar {
+            background: rgba(45, 45, 45, 0.95) !important;
+            border-bottom: 1px solid #444;
+        }
+
+        body.dark-mode .navbar-brand {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .nav-link {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .nav-link:hover {
+            color: #ff8c00 !important;
+        }
+
+        body.dark-mode .dropdown-menu {
+            background-color: #2d2d2d;
+            border-color: #444;
+        }
+
+        body.dark-mode .dropdown-item {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .dropdown-item:hover {
+            background-color: #3d3d3d;
+            color: #ff8c00;
+        }
+
+        body.dark-mode .dropdown-header {
+            color: #ff8c00;
+        }
+
+        body.dark-mode .footer-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%) !important;
+        }
+
         .navbar {
             background: rgba(255, 255, 255, 0.95) !important;
             backdrop-filter: blur(10px);

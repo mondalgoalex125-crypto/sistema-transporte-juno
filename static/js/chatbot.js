@@ -369,6 +369,86 @@ class ChatbotManager {
                     }
                 }
                 
+                /* Dark Mode Styles */
+                body.dark-mode .chatbot-window {
+                    background: #2d2d2d !important;
+                    border-color: #444 !important;
+                }
+                
+                body.dark-mode .chatbot-header {
+                    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+                    color: white !important;
+                }
+                
+                body.dark-mode .chatbot-messages {
+                    background: #1a1a1a !important;
+                }
+                
+                body.dark-mode .chatbot-message.bot .message-content {
+                    background: #3d3d3d !important;
+                    border-color: #555 !important;
+                    color: #e0e0e0 !important;
+                }
+                
+                body.dark-mode .chatbot-message.user .message-content {
+                    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+                    color: white !important;
+                }
+                
+                body.dark-mode .message-time {
+                    color: #aaa !important;
+                }
+                
+                body.dark-mode .quick-action-btn {
+                    background: #3d3d3d !important;
+                    border-color: #555 !important;
+                    color: #e0e0e0 !important;
+                }
+                
+                body.dark-mode .quick-action-btn:hover {
+                    background: var(--primary-color) !important;
+                    color: white !important;
+                    border-color: var(--primary-color) !important;
+                }
+                
+                body.dark-mode .chatbot-input {
+                    background: #2d2d2d !important;
+                    border-top-color: #444 !important;
+                }
+                
+                body.dark-mode .chatbot-input .form-control {
+                    background: #3d3d3d !important;
+                    border-color: #555 !important;
+                    color: #ffffff !important;
+                }
+                
+                body.dark-mode .chatbot-input .form-control::placeholder {
+                    color: #bbb !important;
+                }
+                
+                body.dark-mode .typing-indicator {
+                    background: #2d2d2d !important;
+                    color: #e0e0e0 !important;
+                }
+                
+                body.dark-mode .typing-dots span {
+                    background: #aaa !important;
+                }
+                
+                body.dark-mode .chatbot-controls .btn {
+                    color: white !important;
+                }
+                
+                body.dark-mode .chatbot-options .btn {
+                    background: #3d3d3d !important;
+                    border-color: #555 !important;
+                    color: #e0e0e0 !important;
+                }
+                
+                body.dark-mode .chatbot-options .btn:hover {
+                    background: #4d4d4d !important;
+                }
+                
                 /* Responsive */
                 @media (max-width: 480px) {
                     .chatbot-widget {
